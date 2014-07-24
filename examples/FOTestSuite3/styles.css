@@ -1,0 +1,182 @@
+#customers{
+    font-family:sans-serif;
+    width:100%;
+    border-collapse:collapse;
+}
+#customers td,
+#customers th{
+    font-size:12px;
+    border:1px solid #98bf21;
+    padding:3px 7px 2px 7px;
+}
+#customers th{
+    font-size:14px;
+    text-align:left;
+    padding-top:5px;
+    padding-bottom:4px;
+    background-color:#A7C942;
+    color:#ffffff;
+}
+#customers tr.alt td{
+    color:#000000;
+    background-color:#EAF2D3;
+}
+div.h1{
+    font-weight:bold;
+    font-style:italic
+}
+h1{
+    font-size:40px;
+}
+h2{
+    border-top:3px solid #111111;
+    background-color:#eeeeee;
+    font-size:30px;
+    padding:3px 10px;
+}
+.redcell{
+    background-color:red;
+}
+.redtext{
+    color:red;
+}
+.bigborder{
+    border:3pt solid rgb(30, 70, 200);
+}
+.psample{
+    border:3pt solid rgb(30, 70, 200);
+    background-color:silver;
+    padding:18px;
+    text-align:center;
+    font-size:30px;
+    font-weight:bold;
+}
+ul.square{
+    list-style-type:square;
+}
+ol.lower-alpha{
+    list-style-type:lower-alpha;
+}
+ol.upper-roman{
+    list-style-type:upper-roman;
+}
+ol.lower-roman{
+    list-style-type:lower-roman;
+}
+.center{
+    text-align:center;
+}
+.testspan{
+    font-weight:bold;
+    font-style:italic;
+    color:#33fcf3;
+    text-decoration:underline;
+}
+.alert-box{
+    color:#555;
+    font-family:sans-serif;
+    font-size:11px;
+    padding:10px 10px 10px 36px;
+    margin:10px;
+}
+.alert-box span{
+    font-weight:bold;
+    text-transform:uppercase;
+}
+.error{
+    background:#ffecec url('Images/error.png') no-repeat 10px 10px;
+    border:1px solid #f5aca6;
+}
+.success{
+    background:#e9ffd9 url('Images/success.png') no-repeat 10px 10px;
+    border:1px solid #a6ca8a;
+}
+.warning{
+    background:#fff8c4 url('Images/warning.png') no-repeat 10px 10px;
+    border:1px solid #f2c779;
+}
+.notice{
+    background:#e3f7fc url('Images/notice.png') no-repeat 10px 10px;
+    border:1px solid #8ed9f6;
+}
+.bread{
+    background-color:#dddddd;
+    border:1pt solid black;
+    padding:3px;
+    margin-bottom:25px;
+}
+.bread ul{
+    margin-left:0;
+    padding-left:0;
+    display:inline;
+    border:none;
+}
+.bread ul li{
+    margin-left:0;
+    padding-left:2px;
+    border:none;
+    list-style:none;
+    display:inline;
+}
+.tabs ul{
+    padding-left:0px;
+    display:inline;
+    border-bottom: 1px solid #000;
+    padding-bottom: 5px;
+}
+.tabs ul li{
+    margin-right: 3px;
+    margin-bottom: 5px;
+    padding: 6px 15px 5px 15px;
+    border:1px solid #000;
+    list-style:none;
+    display:inline;
+}
+.tabs ul li.here{
+    border-bottom:1px solid #ffc;
+    list-style:none;
+    display:inline;
+    background-color: #dddd11;
+}
+.tabs a {
+    text-decoration: none;
+    color: black;
+}
+.toc {
+    list-style-type:none;
+}
+.toc > li {
+    list-style-type:none;
+    list-style-image: url('Images/folder.gif');
+    margin:0px 0px 0px;
+}
+.toc > li > a{
+    font-family: sans-serif;
+    font-size: 13px;
+    color: #3333dd;
+    text-decoration: none;
+}
+.break {
+    page-break-before: always;
+}
+#printcopy{
+/* Here we try to implement styles to be used */
+    width:8.5in;
+    height:11in;
+    margin:0.5in;
+}
+/* d3 Pie Chart Stuff */
+.d3 path.slice{
+	stroke-width:2px;
+}
+.d3 polyline{
+	opacity: .3;
+	stroke: black;
+	stroke-width: 2px;
+	fill: none;
+} 
+.d3 svg text.percent{
+	fill:white;
+	text-anchor:middle;
+	font-size:12px;
+}

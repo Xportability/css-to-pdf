@@ -1,0 +1,34 @@
+.nav{
+position: fixed;
+top: 0px;
+width: 100%;
+clear: both;
+float: left;
+list-style: none;
+padding: 0px 0px 0px 0px;
+margin-top: 0px;
+border-bottom:1px solid #333333; /* Remove to create tab effect*/
+background-color: white;
+}
+.navitem {
+display: inline;
+list-style: none;
+}
+.navitem > a {
+margin-right:10px;
+color: #FFFFFF;
+display: block;
+float:left;
+font: 14px/100% Arial, Helvetica, sans-serif;
+line-height: 32px;
+text-decoration: none;
+vertical-align: middle;
+padding: 0 10px;
+background-image:url('Images/nav-tab-bg.png');
+background-color:#000000; /*A basic background color is set incase the image will not load*/
+border:1px solid #333333;
+border-bottom:none;
+}
+.navitem > a:hover {
+    color:red;
+}
