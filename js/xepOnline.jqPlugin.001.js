@@ -106,16 +106,15 @@ xepOnline.Formatter = {
 	        xepOnline.Formatter.copyComputedStyle(elm2, elm2, parentStyle);
 	    });
 	},
-	getChandraServiceRequest: function(PrintCopy, MimeType) {
+	getFormData: function(PrintCopy, Name, MimeType, FileName) {
 		var data = xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
 	    var blob = new Blob([data],
 	    	{ type: xepOnline.Formatter.src_type.xml }
 	    );
 	    var chandraObj = new FormData();
 
-	    chandraObj.append('xml',blob,"document.xml");
+	    chandraObj.append(Name,blob,FileName);
 	    chandraObj.append('mimetype', MimeType);
-
 	    return chandraObj;
 	},
 	togglePrintMediaStyle: function() {
@@ -238,6 +237,7 @@ xepOnline.Formatter = {
 		return builder += (data || '');
 	},
 	xep_chandra_service: 'http://online.xep.com/RenderX.WebServices/Chandra.svc/format',
+	xep_chandra_service_AS_PDF: 'http://online.xep.com/RenderX.WebServices/Chandra.svc/format2',
 	xsl_stylesheet_declaration: '<?xml-stylesheet type="text/xsl" href="http://www.xportability.com/XEPOnline/xeponline-fo-translate.xsl"?>',
 	src_type: { xml: 'text/xml'},
 	mime_type: { pdf: 'application/pdf'},
@@ -250,9 +250,7 @@ xepOnline.Formatter = {
 			pageMarginRight: "1in",
 			pageMarginBottom: "1in",
 			pageMarginLeft: "1in",
-			render:(true<default>|false),		// suppresses PDF rendering leaving behind print preview
-			silent:(true|false<default>),		// hides the print media preview during creation of PDF
-			embed:(true|false<default>),		// embeds pdf into html replacing the preview container
+			render: ("none"|"newwin<default>"|embed"|"download<default IE>"),
 			cssStyle: {							// puts css style attributes on the root, ex. fontSize:14px
 						cssStyleName: 'value', ...
 					},
@@ -262,21 +260,30 @@ xepOnline.Formatter = {
 		}
 	*/
 	Format: function(ElementID, options) {
+		options.render = (options && options.render === undefined) ? options.render = 'newwin' : options.render;
+		if(xepOnline.IE()) {
+			options.render = 'download';
+		}
+
 		xepOnline.Formatter.__elm = $('#' + ElementID)[0];
 		xepOnline.Formatter.__clone = $(xepOnline.Formatter.__elm)[0].outerHTML;
 		xepOnline.Formatter.__container = xepOnline.Formatter.getFOContainer(options);
 
 		$('#' + ElementID).after($(xepOnline.Formatter.__container));
-
-		if(options && options.silent && (options.render || true)) {
-			$(xepOnline.Formatter.__clone).appendTo($(xepOnline.Formatter.__container));			
-		} else {
-			$('#' + ElementID).appendTo($(xepOnline.Formatter.__container));			
-		}
+		$(xepOnline.Formatter.__elm).appendTo($(xepOnline.Formatter.__container));			
 
 		xepOnline.Formatter.togglePrintMediaStyle();
 		xepOnline.Formatter.flattenStyle($(xepOnline.Formatter.__container)[0]);
 	
+
+	    if(options.render === 'none') {
+	    	return false;
+	    }
+
+	    if(options.render === 'embed') {
+	    	xepOnline.Formatter.__container.attr('data-xeponline-embed-pending', 'true');
+	    }
+
 	    var printcopy = $(xepOnline.Formatter.__container)[0].outerHTML;
 	    // fix broken image tags		
 	    printcopy = printcopy.replace(/(<img("[^"]*"|[^\/">])*)>/g, "$1/>");
@@ -285,26 +292,27 @@ xepOnline.Formatter = {
 	    	printcopy = xepOnline.Formatter.fixSVGDeclarations(printcopy);
 		}
 
-	    if(options && options.render === false) {
-	    	xepOnline.Formatter.__container.attr('data-xeponline-silent', 'true');
-	    	return;
-	    }
-	    if(options && options.embed) {
-	    	xepOnline.Formatter.__container.attr('data-xeponline-embed-pending', 'true');
-	    }
-
 	    xepOnline.Formatter.Clear();
 
-	    $.ajax({
-		    type: "POST",
-		    url: xepOnline.Formatter.xep_chandra_service,
-		    processData: false,
-		    contentType: false,
-		    data: xepOnline.Formatter.getChandraServiceRequest(printcopy, xepOnline.Formatter.mime_type.pdf),
-	    	success: xepOnline.Formatter.__postBackSuccess,
-	    	error: xepOnline.Formatter.__postBackFailure
-	    });
-
+		var data = xepOnline.Formatter.xsl_stylesheet_declaration + printcopy;
+	    if(options.render === 'download') {
+			$('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'test_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
+			$('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + xepOnline.Formatter.mime_type.pdf + '\'/>');
+			$('#temp_post').append('<textarea name=\'xml\'>' + btoa(data) + '</textarea>');
+			$('#temp_post').submit();
+			$('#temp_post').remove();
+			xepOnline.Formatter.clear();
+	    } else {
+		    $.ajax({
+			    type: "POST",
+			    url: xepOnline.Formatter.xep_chandra_service,
+			    processData: false,
+			    contentType: false,
+			    data: xepOnline.Formatter.getFormData(printcopy, 'xml', xepOnline.Formatter.mime_type.pdf, 'document.xml'),
+		    	success: xepOnline.Formatter.__postBackSuccess,
+		    	error: xepOnline.Formatter.__postBackFailure
+		    });
+	    }
 	    return false; 
 	},
 	Clear: function() {
@@ -312,45 +320,40 @@ xepOnline.Formatter = {
 			$(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true')
 			return;			
 
-		if($(xepOnline.Formatter.__container).attr('data-xeponline-silent') !== 'true' || $(xepOnline.Formatter.__container).attr('data-xeponline-embed') === 'true') {
-			$(xepOnline.Formatter.__container).after(xepOnline.Formatter.__clone);
-		}
+		$(xepOnline.Formatter.__container).after(xepOnline.Formatter.__clone);
 		$(xepOnline.Formatter.__container).remove();
 	    xepOnline.Formatter.togglePrintMediaStyle();
 	},
 	__postBackSuccess: function(Response) {
 		var base64PDF = $(Response).find("Result").text();
 
-		if($(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true') {
+		var objbuilder = '';
+		objbuilder += ('<object width="100%" height="100%" data="data:application/pdf;base64,');
+		objbuilder += (base64PDF);
+		objbuilder += ('" type="application/pdf" class="internal">');
+		objbuilder += ('<embed src="data:application/pdf;base64,');
+		objbuilder += (base64PDF);
+		objbuilder += ('" type="application/pdf" />');
+		objbuilder += ('</object>');
+
+		if($(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true') {			
 			$(xepOnline.Formatter.__elm).remove();
+			$(xepOnline.Formatter.__container).append(objbuilder);
 			$(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending', null);
 			$(xepOnline.Formatter.__container).attr('data-xeponline-embed', 'true');
-			$(xepOnline.Formatter.__container).html('<object width="100%" height="100%" data="data:application/pdf;base64,' + base64PDF + '" type="application/pdf" width="100%" class="internal">' + 
-				'<embed src="data:application/pdf;base64,' + base64PDF + '" type="application/pdf" />' +
-				'</object>');
-
 		} else {
-
 			// TODO: try catch window open "pop-up blocker"
 			var win = window.open("","XEPOnline PDF Result","titlebar=yes");
 			win.document.title = "XEPOnline PDF Result";
-/*			$(win.document.body).html('<object width="100%" height="100%" data="data:application/pdf;base64,' + base64PDF + '" type="application/pdf" width="100%" class="internal">' + 
-				'<embed src="data:application/pdf;base64,' + base64PDF + '" type="application/pdf" />' +
-				'</object>');
-*/
 			win.document.write('<html><body>');
-			win.document.write('<object width="100%" height="100%" data="data:application/pdf;base64,');
-			win.document.write(base64PDF);
-			win.document.write('" type="application/pdf" width="100%" class="internal">');
-			win.document.write('<embed src="data:application/pdf;base64,');
-			win.document.write(base64PDF);
-			win.document.write('" type="application/pdf" />');
-			win.document.write('</object>');
+			win.document.write(objbuilder);
 			win.document.write('</body></html>');
+			layer = $(win.document);
 		}
+
 	},
 	__postBackFailure: function (request, status, error){
-		console.log('error: ' + request.responseText);
+		alert('Woops, an exception occurred.  Please try again.');
 	}
 
 }
