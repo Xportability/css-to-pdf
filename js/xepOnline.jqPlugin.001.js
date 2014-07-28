@@ -52,7 +52,7 @@ xepOnline.Formatter = {
             'display', 'direction', 'dominantBaseline', 
             'fill', 'float', 
             'fontStyle', 'fontVariant', 'fontWeight', 'fontSize', 'fontFamily', 
-            'listStyleType', 'letterSpacing', 
+            'listStyleType', 'listStyleImage', 'letterSpacing', 
             'marginTop', 'marginBottom', 'marginLeft', 'marginRight','orphans', 
             'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
             'pageBreakAfter', 'pageBreakBefore', 
@@ -157,27 +157,30 @@ xepOnline.Formatter = {
 		options = options || {};
 		var container = $('<div class=\'xeponline-container\'></div>');
 		var stylebuilder = '';
+		var fostylebuilder = '';
+
 		container.attr('page-width', options.pageWidth || xepOnline.DEFAULTS.pageWidth);
 		stylebuilder += 'width: ' + (options.pageWidth || xepOnline.DEFAULTS.pageWidth) + '; ';
 		container.attr('page-height', options.pageHeight || xepOnline.DEFAULTS.pageHeight);
+
 		if(options && options.pageMargin) {
-			container.attr('margin', options.pageMargin);
+			container.attr('page-margin', options.pageMargin);
 			stylebuilder += 'margin: ' + options.pageMargin + '; ';
 		}
 		if(options && options.pageMarginTop) {
-			container.attr('margin-top', options.pageMarginTop);
+			container.attr('page-margin-top', options.pageMarginTop);
 			stylebuilder += 'margin-top: ' + options.pageMarginTop + '; ';
 		}
 		if(options && options.pageMarginRight) {
-			container.attr('margin-right', options.pageMarginRight);
+			container.attr('page-margin-right', options.pageMarginRight);
 			stylebuilder += 'margin-right: ' + options.pageMarginRight + '; ';
 		}
 		if(options && options.pageMarginBottom) {
-			container.attr('margin-bottom', options.pageMarginBottom);
+			container.attr('page-margin-bottom', options.pageMarginBottom);
 			stylebuilder += 'margin-bottom: ' + options.pageMarginBottom + '; ';
 		}
 		if(options && options.pageMarginLeft) {
-			container.attr('margin-left', options.pageMarginLeft);
+			container.attr('page-margin-left', options.pageMarginLeft);
 			stylebuilder += 'margin-left: ' + options.pageMarginLeft + '; ';
 		}
 
@@ -189,11 +192,12 @@ xepOnline.Formatter = {
 
 		if(options && options.foStyle) {
 			for(s in options.foStyle) { 
-				stylebuilder += s.fromCamel() + ': ' + options.foStyle[s] + '; ';				
+				fostylebuilder += s.fromCamel() + ': ' + options.foStyle[s] + '; ';				
 			}
 		}
 
 		container.attr('style', stylebuilder);
+		container.attr('fostyle', fostylebuilder);
 
     	var pathname = $(location).attr('pathname').substring(0, $(location).attr('pathname').lastIndexOf('/') + 1);
     	var base = $(location).attr('protocol') + '//' + $(location).attr('hostname') + pathname;
@@ -250,6 +254,7 @@ xepOnline.Formatter = {
 			pageMarginRight: "1in",
 			pageMarginBottom: "1in",
 			pageMarginLeft: "1in",
+			pageMediaResource: "name_of_css_stylesheet",
 			render: ("none"|"newwin<default>"|embed"|"download<default IE>"),
 			cssStyle: {							// puts css style attributes on the root, ex. fontSize:14px
 						cssStyleName: 'value', ...
@@ -301,7 +306,6 @@ xepOnline.Formatter = {
 			$('#temp_post').append('<textarea name=\'xml\'>' + btoa(data) + '</textarea>');
 			$('#temp_post').submit();
 			$('#temp_post').remove();
-			xepOnline.Formatter.clear();
 	    } else {
 		    $.ajax({
 			    type: "POST",
