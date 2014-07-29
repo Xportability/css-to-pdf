@@ -58,6 +58,7 @@ xepOnline.Formatter = {
             'pageBreakAfter', 'pageBreakBefore', 
             'tableLayout', 
             'textAlign', 'textAnchor','textDecoration', 'textIndent', 'textTransform', 
+            'verticalAlign',
             'widows', 'wordSpacing', 'width'],            
 	getRealStyle: function(elm) {
 	    var returnObj = {};
