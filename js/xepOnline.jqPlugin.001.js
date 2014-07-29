@@ -208,7 +208,7 @@ xepOnline.Formatter = {
 	},
 	// IE Hack!
 	fixSVGDeclarations: function(data) {
-		var builder = null;
+		var builder = '';
 
 		var regx = /<svg ("[^"]*"|[^\/">])*>/ig;
 		var match = regx.exec(data);
