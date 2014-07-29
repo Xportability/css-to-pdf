@@ -240,9 +240,9 @@ xepOnline.Formatter = {
 
 		return builder += (data || '');
 	},
-	xep_chandra_service: 'http://online.xep.com/RenderX.WebServices/Chandra.svc/format',
-	xep_chandra_service_AS_PDF: 'http://online.xep.com/RenderX.WebServices/Chandra.svc/format2',
-	xsl_stylesheet_declaration: '<?xml-stylesheet type="text/xsl" href="http://www.xportability.com/XEPOnline/xeponline-fo-translate.xsl"?>',
+	xep_chandra_service: 'http://localhost/RenderX.WebServices/Chandra.svc/format',
+	xep_chandra_service_AS_PDF: 'http://localhost/RenderX.WebServices/Chandra.svc/format2',
+	xsl_stylesheet_declaration: '<?xml-stylesheet type="text/xsl" href="http://localhost/XSL/xeponline-fo-translate.xsl"?>',
 	src_type: { xml: 'text/xml'},
 	mime_type: { pdf: 'application/pdf'},
 	/* options	
@@ -301,7 +301,7 @@ xepOnline.Formatter = {
 
 		var data = xepOnline.Formatter.xsl_stylesheet_declaration + printcopy;
 	    if(options.render === 'download') {
-			$('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'test_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
+			$('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'temp_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
 			$('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + xepOnline.Formatter.mime_type.pdf + '\'/>');
 			$('#temp_post').append('<textarea name=\'xml\'>' + btoa(data) + '</textarea>');
 			$('#temp_post').submit();

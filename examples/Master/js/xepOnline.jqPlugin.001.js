@@ -301,7 +301,7 @@ xepOnline.Formatter = {
 
 		var data = xepOnline.Formatter.xsl_stylesheet_declaration + printcopy;
 	    if(options.render === 'download') {
-			$('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'test_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
+			$('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'temp_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
 			$('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + xepOnline.Formatter.mime_type.pdf + '\'/>');
 			$('#temp_post').append('<textarea name=\'xml\'>' + btoa(data) + '</textarea>');
 			$('#temp_post').submit();
