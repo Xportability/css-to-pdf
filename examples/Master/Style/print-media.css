@@ -1,0 +1,17 @@
+.noprint {
+	display:none;
+}
+#customers.black-white th {
+    background-color:#FFF;
+    color:#000;
+    border:1px solid #999;
+}
+#customers.black-white tr td {
+    color:#000;
+    border:1px solid #999;
+}
+#customers.black-white tr.alt td{
+    color:#000;
+    background-color:#CCC;
+    border:1px solid #999;
+}

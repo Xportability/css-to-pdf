@@ -1,0 +1,33 @@
+StmtSum{
+display:table;
+width:100%;
+}
+TableHeader{
+display:table-header-group;
+}
+TableHeader * {
+font-weight:bold;
+background-color:#D3D8C1;    
+text-align:center;
+}
+TableRows{
+    display:table-row-group;
+}
+AcctSum{
+display:table-row
+}
+AcctSum.alt *{
+    color:#000000;
+    background-color:#EAF2D3;
+}
+ProdDes, AcctNum, Bal, NName, PlId, ProdGrp, RspFlg{
+display:table-cell;
+border:1pt solid black;
+padding:3px;
+}
+AcctSum Bal{
+    text-align:right;
+}
+AcctSum AcctNum, ProdGrp, RspFlg {
+    text-align:center;
+}

@@ -1,0 +1,33 @@
+footnote {
+  position: relative;
+  display: inline;
+}
+footnote footnote-body {
+  position: absolute;
+  width:300px;
+  color: #FFFFFF;
+  background: 	#85AD33;
+  max-height: 400px;
+  visibility: hidden;
+  border-radius: 6px;
+  padding: 4px 4px 6px;
+}
+footnote footnote-body:after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -8px;
+  width: 0; height: 0;
+  border-top: 8px solid #000000;
+  border-right: 8px solid transparent;
+  border-left: 8px solid transparent;
+}
+footnote:hover footnote-body {
+  visibility: visible;
+  opacity: 0.9;
+  bottom: 30px;
+  left: 50%;
+  margin-left: -76px;
+  z-index: 999;
+}
