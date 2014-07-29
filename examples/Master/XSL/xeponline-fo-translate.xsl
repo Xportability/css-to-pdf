@@ -99,10 +99,10 @@
       <!-- Modify this to trigger new page sequence for each section -->
       <fo:page-sequence master-reference="svgimage">
         <fo:static-content flow-name="xsl-region-before">
-          <xsl:apply-templates select="//header[1]" mode="regions"/>
+          <xsl:apply-templates select="descendant::header[1]" mode="regions"/>
         </fo:static-content>
         <fo:static-content flow-name="xsl-region-after">
-          <xsl:apply-templates select="//footer[1]" mode="regions"/>
+          <xsl:apply-templates select="descendant::footer[1]" mode="regions"/>
         </fo:static-content>
         <fo:static-content flow-name="xsl-footnote-separator">
           <fo:block>

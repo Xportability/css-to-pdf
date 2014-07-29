@@ -49,13 +49,13 @@
             <header style="display:none; margin-top:60px;">
                 <table>
                     <tr>
-                        <td>This is a header</td>
+                        <td>XEPOnline HTML to PDF Test Document</td>
                         <td style="text-align:right">Xportability</td>
                     </tr>
                 </table>
             </header>
             <footer style="display:none">
-                <p>Test Footer</p>
+                <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
             </footer>
             <h1 id="top">XEPOnline HTML to PDF Test Document</h1>
             <p style="font-size:20px">This document serves to test various <b>sample</b> HTML
@@ -74,11 +74,7 @@
                 content in the page for special formatting. You can easily extend this solution to
                 format any XML markup in your page, not only HTML. </p>
             <p>Push the "Print It!" button, get your result and keep reading.</p>
-            <div class="alert-box notice"><span>Notice: </span>The implementation of this test site
-                replaces the original HTML &lt;div&gt; with PDF embedded as base-64. This <b>will
-                    not work in Internet Explorer</b> because they disallow base-64 encoded PDF.
-                This is not a limitation of the technology, only how we have chosen to implement for
-                testing.</div>
+            <p>Throughout this document you will also see print buttons like this <img src="Images/button-print.png"/> located on certain headings. This is a demonstration of using the code to print a single &lt;div&gt;. Some of the buttons vary settings for print.</p>
             <h2 id="How_it_Works">How it Works</h2>
             <p>The XEPOnline javascript library extracts the content of a named &lt;div&gt; element
                 in the HTML page. It processes that &lt;div&gt; and embeds all css-based styling
@@ -140,9 +136,28 @@
                 <p class="psample">I am a test paragraph!</p>
             </div>
             <p>Note also that some other attributes you can use within the HTML that have no effect
-                on the appearance of the page can also be used. The following heading makes use of
-                the css attribute "page-break-before" causing it to start a new page.</p>
-            <h2 id="Headings" class="break">Headings</h2>
+                on the appearance of the page can also be used. For instance, you can use
+                the css attribute "page-break-before" to start a new page.</p>
+            <h2 id="Print_Media">Print Media</h2>
+            <p>This solution also supports various aspects of print media. The print media stylesheet is applied to the data before 
+            sending it to be processed and as such, you can affect various style changes as well as inject page information this way. 
+            Some browsers fully support CSS3 print media @page attributes while others do not. However, the system was created so you can 
+            either use @page or you can specify in code.</p>
+            <p class="noprint psample">This paragraph will not print in the output because it's class is set to "noprint" and the print media 
+                css used sets all "noprint" elements to "display:none".</p>
+            <div id="structures">
+                <h2 id="Headings" class="break"><a class="noprint nodec" id="printit" href="#" onclick="return xepOnline.Formatter.Format('structures',{pageMargin:'0.5in'});"><img src="Images/button-print.png"/> </a>Headings</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Headings, Block Structures and Inlines</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
             <h3>Heading level 3 without any specific style changes</h3>
             <h4>Heading Level 4</h4>
             <h5>Heading Level 5</h5>
@@ -175,7 +190,21 @@ we support the "pre" element.</pre>
                 export the "text-decoration" attribute and instead uses a strange "0px" border
                 construct that only Chrome interprets as an underline. The above css style for
                 underline in Chrome is represented as "border: 0px none rgb(51, 252, 243)".</div>
-            <h2 id="Tables">Tables</h2>
+            </div>
+            <div id="tablediv">
+                           
+                <h2 id="Tables"><a class="noprint nodec" id="printit" href="#" onclick="return xepOnline.Formatter.Format('tablediv',{pageMargin:'0.5in'});"><img src="Images/button-print.png"/> </a>Tables</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Tables</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
             <p><b>Tables</b>: This section tests various tabular structures including borders,
                 colors and spanning.</p>
             <div class="alert-box notice"><span>Notice: </span>You can use the elements
@@ -283,8 +312,21 @@ we support the "pre" element.</pre>
                     </tr>
                 </tbody>
             </table>
-            <h2 id="Lists">Lists</h2>
-            <div class="alert-box error"><span>Exception: </span>Lists in HTML (can) carry an
+            </div>
+            <div id="listdiv">
+                <h2 id="Lists"><a class="noprint nodec" id="printit" href="#" onclick="return xepOnline.Formatter.Format('listdiv',{pageMargin:'0.5in'});"><img src="Images/button-print.png"/> </a>Lists</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Lists</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
+                <div class="alert-box error"><span>Exception: </span>Lists in HTML (can) carry an
                 attribute that indicates the style for the list (like decimal, upper-roman, disk,
                 square, etc.) In HTML this style is inherited from parent lists to child lists
                 unless the style is changed. There is no equivalent to this in XSL FO. The current
@@ -394,6 +436,7 @@ we support the "pre" element.</pre>
                 </li>
                 <li>Three</li>
             </ol>
+            </div>
             <h3 id="Special_Processing">Special Processing</h3>
             <p>A very common use of the list element in HTML is to provide specialty structures like
                 breadcrumbs or navigation tabs. While most of these structures are likely not
@@ -440,8 +483,19 @@ we support the "pre" element.</pre>
                     </ul>
                 </ul>
             </div>
-
-            <h2 id="Images">Images</h2>
+        <div id="imagediv">
+            <h2 id="Images"><a class="noprint nodec" id="printit" href="#" onclick="return xepOnline.Formatter.Format('imagediv',{pageMargin:'0.5in'});"><img src="Images/button-print.png"/> </a>Images</h2>
+            <header style="display:none; margin-top:60px;">
+                <table>
+                    <tr>
+                        <td>Images</td>
+                        <td style="text-align:right">Xportability</td>
+                    </tr>
+                </table>
+            </header>
+            <footer style="display:none">
+                <p class="foot">Test Footer</p>
+            </footer>
             <p>Images in web pages can be linked via absolute or relative references or they can be
                 embedded directly in the web page using a data-uri scheme. All of these methods are
                 supported. In addition, modern browsers make signifcant use of SVG as a format that
@@ -814,14 +868,30 @@ we support the "pre" element.</pre>
                 time. This sample is dynamic, click this paragraph and the pie chart data changes.
                 The print file will represent what is on the screen at that time.</p>
             <div class="d3" id="d3donut"></div>
-            <h2 id="Hyperlinks">Hyperlinks</h2>
-            <p>Hyperlinks can be carried into the output PDF. </p>
+        </div>
+            <div id="hyperdiv">
+                <h2 id="Hyperlinks"><a class="noprint nodec" id="printit" href="#" onclick="return xepOnline.Formatter.Format('hyperdiv',{pageMargin:'0.5in'});"><img src="Images/button-print.png"/> </a>Hyperlinks</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Hyperlinks</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
+                <p>Hyperlinks can be carried into the output PDF. </p>
             <h3 id="External">External</h3>
             <p>This link should go to the <a href="http://online.xep.com">XEPOnline</a> web site. </p>
             <h3 id="Internal">Internal</h3>
             <p>Links can also point to internal destinations which are carried through to the PDF.
                 Using many of the concepts above, you could create a list that is the document table
                 of contents styled with css to add images and control appearance.</p>
+                <div class="alert-box notice"><span>Notice: </span>Obviously if you are generating internal links 
+                you should make sure that all the destinations in question are in the document. This sample has links 
+                outside of this section and therefore these will not work if you use only the section print function.</div>
             <ul class="toc">
                 <li>
                     <a href="#top">XEPOnline HTML to PDF Test Document</a>
@@ -896,8 +966,20 @@ we support the "pre" element.</pre>
                     </ul>
                 </li>
             </ul>
-            <div>
-                <h2 id="Floats">Floating Content</h2>
+            </div>
+            <div id="floatingdiv">
+                <h2 id="Floats"><a class="noprint nodec" id="printit" href="#" onclick="return xepOnline.Formatter.Format('floatingdiv',{pageMargin:'0.5in'});"><img src="Images/button-print.png"/> </a>Floating Content</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Floats</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
                 <p>Many current implementations in HTML make use of responsive designs. The
                     challenge is to try and replicate this HTML into the printed page. The trigger
                     here is the float element. We will start with an easy example, how about
@@ -947,8 +1029,19 @@ we support the "pre" element.</pre>
                     </div>
                 </div>
             </div>
-            <div style="clear: both; page-break-before: always">
-                <h2 id="Custom">Custom Tips and Tricks</h2>
+            <div style="clear: both; page-break-before: always" id="customdiv">
+                <h2 id="Custom"><a class="noprint nodec" id="printit" href="#" onclick="return xepOnline.Formatter.Format('customdiv',{pageMargin:'0.5in'});"><img src="Images/button-print.png"/> </a>Custom Tips and Tricks</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Custom Tips &amp; Tricks</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
                 <h3>Pass-Through XSL FO Styling</h3>
                 <p style="color: brown; text-align:justify;"
                     fostyle="text-align-last: left; font-stretch: wider; font-size-adjust:0.6; hyphenate: true; color:rgb-icc (255, 255, 0, #CMYK, .1, .2, .7, .5);"
@@ -986,7 +1079,7 @@ we support the "pre" element.</pre>
         &lt;/block&gt;
     &lt;/footnote-body&gt;
 &lt;footnote&gt;</pre>
-            </div>
+
             <h3>Custom XML in Web Page</h3>
             <p>With today's browser technology, you can use css to style any content you wish. This
                 includes any generic XML inserted into the HTML file. For example, consider that you
@@ -1199,6 +1292,7 @@ we support the "pre" element.</pre>
                 PDF. You so not have to change XML tags, you only indicate their style as "table" or
                 "table-row" or "block" or "inline" in the css and XEPOnline will format the generic
                 XML according to the css styling to print.</p>
+        </div>
             <h2>What's Coming?</h2>
             <p>Well, first we need to get the Javascript library written and published to Github. We
                 will also post the XSL used in the process for converting the (cleaned-up) HTML to
