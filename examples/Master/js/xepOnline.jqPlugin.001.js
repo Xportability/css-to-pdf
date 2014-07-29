@@ -302,7 +302,7 @@ xepOnline.Formatter = {
 
 		var data = xepOnline.Formatter.xsl_stylesheet_declaration + printcopy;
 	    if(options.render === 'download') {
-			$('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'temp_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
+			$('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'temp_post\' target=\'_blank\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
 			$('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + xepOnline.Formatter.mime_type.pdf + '\'/>');
 			$('#temp_post').append('<textarea name=\'xml\'>' + btoa(data) + '</textarea>');
 			$('#temp_post').submit();
@@ -348,7 +348,7 @@ xepOnline.Formatter = {
 			$(xepOnline.Formatter.__container).attr('data-xeponline-embed', 'true');
 		} else {
 			// TODO: try catch window open "pop-up blocker"
-			var win = window.open("","XEPOnline PDF Result","titlebar=yes");
+			var win = window.open("","_blank","titlebar=yes");
 			win.document.title = "XEPOnline PDF Result";
 			win.document.write('<html><body>');
 			win.document.write(objbuilder);
