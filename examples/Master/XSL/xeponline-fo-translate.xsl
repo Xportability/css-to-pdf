@@ -687,7 +687,7 @@
       </xsl:when>
       <xsl:when test="$attr = 'vertical-align'">
         <xsl:choose>
-          <xsl:when test="$type = 'td' or $type = 'th'">
+          <xsl:when test="$type = 'td' or $type = 'th' or $type = 'tbody'">
             <xsl:attribute name="display-align">
               <xsl:choose>
                 <xsl:when test="$value = 'middle'">
