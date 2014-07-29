@@ -240,8 +240,8 @@ xepOnline.Formatter = {
 
 		return builder += (data || '');
 	},
-	xep_chandra_service: 'http://localhost/RenderX.WebServices/Chandra.svc/format',
-	xep_chandra_service_AS_PDF: 'http://localhost/RenderX.WebServices/Chandra.svc/format2',
+	xep_chandra_service: 'http://localhost/RenderX.WebServices/Chandra.svc/genpackage',
+	xep_chandra_service_AS_PDF: 'http://localhost/RenderX.WebServices/Chandra.svc/genfile',
 	xsl_stylesheet_declaration: '<?xml-stylesheet type="text/xsl" href="http://localhost/XSL/xeponline-fo-translate.xsl"?>',
 	src_type: { xml: 'text/xml'},
 	mime_type: { pdf: 'application/pdf'},
