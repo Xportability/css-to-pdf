@@ -24,7 +24,7 @@ line-height: 32px;
 text-decoration: none;
 vertical-align: middle;
 padding: 0 10px;
-background-image:url('/Images/nav-tab-bg.png');
+background-image:url('../images/nav-tab-bg.png');
 background-color:#000000; /*A basic background color is set incase the image will not load*/
 border:1px solid #333333;
 border-bottom:none;
