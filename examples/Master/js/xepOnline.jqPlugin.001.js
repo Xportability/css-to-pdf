@@ -117,9 +117,20 @@ xepOnline.Formatter = {
 	},
 	getFormData: function(PrintCopy, Name, MimeType, FileName) {
 		var data = xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
-	    var blob = new Blob([data],
-	    	{ type: xepOnline.Formatter.src_type.xml }
-	    );
+	    var blob;
+	    try
+	    {
+		    blob = new Blob([data],{ type: xepOnline.Formatter.src_type.xml });
+	    }
+	    catch(e) 
+	    {
+	    	if(e.name == 'TypeError') {
+	    		// TODO: get a blob for Safari   		
+	    	}
+	    }
+
+	    if(blob === undefined) throw new Error('Blob undefined');
+
 	    var chandraObj = new FormData();
 
 	    chandraObj.append(Name,blob,FileName);
