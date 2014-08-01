@@ -101,6 +101,7 @@ xepOnline.Formatter = {
 	cleanTags: function(PrintCopy) {
 
 	    var result = PrintCopy.replace(/(<img("[^"]*"|[^\/">])*)>/g, "$1/>");
+		result = result.replace(/(<br("[^"]*"|[^\/">])*)>/g, "$1/>");
 		result = result.replace(/(<input("[^"]*"|[^\/">])*)>/g, "$1/>");
 		return result;
 
@@ -121,7 +122,7 @@ xepOnline.Formatter = {
 	    });
 	},
 	getFormData: function(PrintCopy, Name, MimeType, FileName) {
-		var data = xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
+		var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
 	    var blob;
 	    try
 	    {
@@ -267,7 +268,7 @@ xepOnline.Formatter = {
 	},
 	xep_chandra_service: 'http://xep.cloudformatter.com/Chandra.svc/genpackage',
 	xep_chandra_service_AS_PDF: 'http://xep.cloudformatter.com/Chandra.svc/genfile',
-	foo_bar:'<!DOCTYPE div [  <!ENTITY % winansi SYSTEM "http://xep.cloudformatter.com/doc/XSL/winansi.xml">  %winansi;]>',
+	entity_declaration:'<!DOCTYPE div [  <!ENTITY % winansi SYSTEM "http://xep.cloudformatter.com/doc/XSL/winansi.xml">  %winansi;]>',
 	xsl_stylesheet_declaration: '<?xml-stylesheet type="text/xsl" href="http://xep.cloudformatter.com/Doc/XSL/xeponline-fo-translate.xsl"?>',
 	src_type: { xml: 'text/xml'},
 	mime_type: { pdf: 'application/pdf'},
@@ -326,7 +327,7 @@ xepOnline.Formatter = {
 
 		var blob;
 		if(options.render !== 'download') {
-			var data = xepOnline.Formatter.xsl_stylesheet_declaration + printcopy;
+			var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + printcopy;
 			try 
 			{
 				blob = xepOnline.Formatter.getFormData(printcopy, 'xml', xepOnline.Formatter.mime_type.pdf, 'document.xml');

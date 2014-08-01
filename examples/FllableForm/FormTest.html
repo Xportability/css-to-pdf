@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/anychart.min.js"></script>
+        <script src="js/d3.min.js"></script>
+        <script src="js/d3-donut.js"></script>
+        <script src="js/xepOnline.jqPlugin.001.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="Style/styles.css" />
+        <link rel="stylesheet" type="text/css" href="Style/nav.css" />
+        <link rel="stylesheet" type="text/css" href="Style/footnote.css" />
+        <link rel="stylesheet" type="text/css" href="Style/xmlsamp.css" />
+        <link rel="stylesheet" type="text/css" href="Style/print-media.css" media="print" />
+
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    </head>
+    <body style="max-width:1000px;">
+        <div class="navbar" style="display:block">
+            <ul class="nav">
+                <li class="navitem">
+                    <a href="#Why">Why?</a>
+                </li>
+                <li class="navitem">
+                    <a href="#How_it_Works">How?</a>
+                </li>
+                <li class="navitem">
+                    <a href="#Headings">Elements</a>
+                </li>
+                <li class="navitem">
+                    <a href="#Images">Images</a>
+                </li>
+                <li class="navitem">
+                    <a href="#Hyperlinks">Hyperlinks</a>
+                </li>
+                <li class="navitem">
+                    <a href="#Floats">Floats</a>
+                </li>
+                <li class="navitem">
+                    <a href="#Custom">Customization</a>
+                </li>
+                <li class="navitem">
+                    <a id="printit" href="#"
+                        onclick="return xepOnline.Formatter.Format('report',{pageMargin:'0.5in'});"
+                        >Print It!</a>
+                </li>
+            </ul>
+            <br />
+        </div>
+        <div id="report">
+            <header style="display:none; margin-top:60px;">
+                <table>
+                    <tr>
+                        <td>XEPOnline HTML to PDF Test Document</td>
+                        <td style="text-align:right">Xportability</td>
+                    </tr>
+                </table>
+            </header>
+            <footer style="display:none">
+                <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+            </footer>
+            <h1 id="top">XEPOnline HTML to PDF Form Test Document</h1>
+            <p style="font-size:20px">This document serves to test various <b>sample</b> HTML
+                elements and there representation in the PDF.</p>
+            <h2 id="Why">Form Elements Basic</h2>
+            <p>Let's create some basic form elements.</p>
+            <form>
+                <div>Text Field 1:<input type="text" name="tf1"></input></div>
+                <div>Text Field 2:<input type="text" name="tf2"></input></div>
+                <div>Text Field 4:<input type="text" name="tf3"></input></div>
+            </form>
+        </div>
+    </body>
+</html>

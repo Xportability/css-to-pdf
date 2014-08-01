@@ -117,9 +117,20 @@ xepOnline.Formatter = {
 	},
 	getFormData: function(PrintCopy, Name, MimeType, FileName) {
 		var data = xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
-	    var blob = new Blob([data],
-	    	{ type: xepOnline.Formatter.src_type.xml }
-	    );
+	    var blob;
+	    try
+	    {
+		    blob = new Blob([data],{ type: xepOnline.Formatter.src_type.xml });
+	    }
+	    catch(e) 
+	    {
+	    	if(e.name == 'TypeError') {
+	    		// TODO: get a blob for Safari   		
+	    	}
+	    }
+
+	    if(blob === undefined) throw new Error('Blob undefined');
+
 	    var chandraObj = new FormData();
 
 	    chandraObj.append(Name,blob,FileName);
@@ -309,6 +320,17 @@ xepOnline.Formatter = {
 	    xepOnline.Formatter.Clear();
 
 		var data = xepOnline.Formatter.xsl_stylesheet_declaration + printcopy;
+		var blob;
+		try 
+		{
+			blob = xepOnline.Formatter.getFormData(printcopy, 'xml', xepOnline.Formatter.mime_type.pdf, 'document.xml');
+		} catch(e) {}
+
+		// if blob not supported, force a download
+		if(blob === undefined) {
+			options.render = 'download';
+		}
+
 	    if(options.render === 'download') {
 			$('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'temp_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
 			$('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + xepOnline.Formatter.mime_type.pdf + '\'/>');
@@ -321,7 +343,7 @@ xepOnline.Formatter = {
 			    url: xepOnline.Formatter.xep_chandra_service,
 			    processData: false,
 			    contentType: false,
-			    data: xepOnline.Formatter.getFormData(printcopy, 'xml', xepOnline.Formatter.mime_type.pdf, 'document.xml'),
+			    data: blob,
 		    	success: xepOnline.Formatter.__postBackSuccess,
 		    	error: xepOnline.Formatter.__postBackFailure
 		    });
