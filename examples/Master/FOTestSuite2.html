@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/anychart.min.js"></script>
+        <script src="js/d3.min.js"></script>
+        <script src="js/d3-donut.js"></script>
+        <script src="js/xepOnline.jqPlugin.004.js"></script>
+        <script>
+            xepOnline.Formatter.xsl_stylesheet_declaration = '<?xml-stylesheet type="text/xsl" href="http://xep.cloudformatter.com/doc/XSL/xeponline-fo-translate-beta.xsl"?>';
+        	xepOnline.Formatter.xep_chandra_service = 'http://xep.cloudformatter.com/Chandra.svc/genpackage';
+	        xepOnline.Formatter.xep_chandra_service_AS_PDF = 'http://xep.cloudformatter.com/Chandra.svc/genfile';
+	        xepOnline.Formatter.entity_declaration = '<!DOCTYPE div [  <!ENTITY % winansi SYSTEM "http://xep.cloudformatter.com/doc/XSL/winansi.xml">  %winansi;]>';
+        function printSelected(){
+            var selected = [];
+            $('#report input:checked').each(function() {
+                selected.push($(this).attr('name'));
+            });
+            if ($(selected).length > 0){
+                xepOnline.Formatter.FormatGroup($(selected),{pageMargin:'0.5in'});
+            }
+        }
+        </script>                
+        <link rel="stylesheet" type="text/css" href="Style/styles.css" />
+        <link rel="stylesheet" type="text/css" href="Style/nav.css" />
+        <link rel="stylesheet" type="text/css" href="Style/footnote.css" />
+        <link rel="stylesheet" type="text/css" href="Style/xmlsamp.css" />
+        <link rel="stylesheet" type="text/css" href="Style/print-media.css" media="print" />
+
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    </head>
+    <body style="max-width:1000px;">
+        <div class="navbar" style="display:block">
+            <ul class="nav">
+                <li class="navitem">
+                    <a href="#Why">Why?</a>
+                </li>
+                <li class="navitem">
+                    <a href="#How_it_Works">How?</a>
+                </li>
+                <li class="navitem">
+                    <a href="#Headings">Elements</a>
+                </li>
+                <li class="navitem">
+                    <a href="#Images">Images</a>
+                </li>
+                <li class="navitem">
+                    <a href="#Hyperlinks">Hyperlinks</a>
+                </li>
+                <li class="navitem">
+                    <a href="#Floats">Floats</a>
+                </li>
+                <li class="navitem">
+                    <a href="#Custom">Customization</a>
+                </li>
+                <li class="navitem">
+                    <a id="printit" href="#"
+                        onclick="return xepOnline.Formatter.Format('report',{pageMargin:'0.5in'});"
+                        >Print It!</a>
+                </li>
+                <li class="navitem">
+                    <a id="printgroup" href="#"
+                        onclick="return printSelected();"
+                        >Print Selected!</a>
+                </li>
+            </ul>
+            <br />
+        </div>
+        <div id="report">
+            <header style="display:none; margin-top:60px;">
+                <table>
+                    <tr>
+                        <td>XEPOnline HTML to PDF Test Document</td>
+                        <td style="text-align:right">Xportability</td>
+                    </tr>
+                </table>
+            </header>
+            <footer style="display:none">
+                <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+            </footer>
+            <h1 id="top">XEPOnline HTML to PDF Test Document</h1>
+            <p style="font-size:20px">This document serves to test various <b>sample</b> HTML
+                elements and there representation in the PDF.</p>
+            <h2 id="Why">Why Did we Develop This?</h2>
+            <p>We tried to address many of the missing elements in some of the web page print
+                solutions we found. In many solutions, they are merely converting the HTML fed to
+                the browser, not the content from the browser DOM. We wanted to be able to process
+                live content, that could vary based on user interaction.</p>
+            <p>We found most all solutions lacking in SVG support. You cannot actually inject the
+                SVG into the print document, you can only insert an image of the SVG in raster form.
+                We wanted high resolution vector-based SVG content. We wanted to leverage formatting
+                technology far superior than a "PDF" writer and/or browser which is not designed as
+                a print composition engine.</p>
+            <p>We also found many situations where we wanted the flexibility of just having some XML
+                content in the page for special formatting. You can easily extend this solution to
+                format any XML markup in your page, not only HTML. </p>
+            <p>Push the "Print It!" button, get your result and keep reading.</p>
+            <p>Throughout this document you will also see print buttons like this <img
+                    src="Images/button-print.png" /> located on certain headings. This is a
+                demonstration of using the code to print a single &lt;div&gt;. There are also checkboxes next to these headings,
+            you can select several checkboxes and use the "Print Selected!" button on the top bar to generate a document with 
+            multiple sections, one for each of the checked divs. These are all demonstratons of the power of the Javascript library and XEPOnline 
+            backend for generating PDFs.</p>
+            <h2 id="How_it_Works">How it Works</h2>
+            <p>The XEPOnline javascript library extracts the content of a named &lt;div&gt; element
+                in the HTML page. It processes that &lt;div&gt; and embeds all css-based styling
+                into the HTML. You can use the library to generate a PDF of any &lt;div&gt;,
+                including those generated with dynamic content as it is processing the browser DOM
+                of the HTML at the time execution. In other words, this is not some canned HTML to
+                print, it is the current HTML to print.</p>
+            <p>We'll cover advanced use concepts in the future, but the whole system is extensible
+                and leverages XSL FO technology for print file generation while maintaining ease of
+                styling via css. The extensibility allows you to customize output in many ways, to
+                extend and expand upon a simple File->Print operation. Because it uses XSL FO at the
+                core, one can certainly do more than generate PDF. You could generate PostScript,
+                AFP or XPS print files if desired.</p>
+            <p>Because HTML is <b>not XML</b>, the solution does some additional processing to
+                ensure a well-formed XML document is exported. That well-formed XML document is
+                generated and sent to the XEPOnline formatter via REST with a reference to a
+                specific XSL stylesheet for processing the HTML tag content to create XSL FO.</p>
+            <p>XEPOnline accepts the REST request, attempts to format the document with RenderX XEP
+                and returns the result. There are several opions to return data from initiating a
+                download to base64 encoding the result and inserting it into the document.</p>
+            <h2 id="Currently_Supported_Elements">Currently Supported Elements</h2>
+            <p>The XSL which processes incoming (X)HTML to XSL FO is written in XSL version 1.0.
+                Most modern web environments make use of very few tags and control appearance
+                through headings, div's, img's and span's with css styles. The template not only
+                supports these core elements but also has support for many legacy structures. The
+                following HTML structures are currently supported:</p>
+            <ul>
+                <li><b>Block Elements</b> - div, h1 through h6, p, blockquote, pre, address, main,
+                    figure, figcaption</li>
+                <li><b>Inline Elements</b> - span, i, b, sup, sub, font, code, em, small, strike,
+                    strong, u, q, dfn, abbr, code, var, samp, kbd, mark</li>
+                <li><b>Special Handling</b> - a, img, svg, header, footer</li>
+                <li><b>Tables</b> - Table support includes thead, tbody, tfoot elements as well as
+                    column and row spanning</li>
+                <li><b>Lists</b> - Partial support for both ul, ol</li>
+            </ul>
+            <p>The new HTML5 tags &lt;section&gt; and &lt;article&gt; are only supported as block
+                elements, not seperate page generating elements at this time. One &lt;header&gt; and
+                one &lt;footer&gt; element are allowed inside the printable &lt;div&gt; and are used
+                for printed document header and footer.</p>
+            <h2 id="Style_Handling">Style Handling</h2>
+            <p>A selected list of appearance styles are passed in css format to the XSL stylesheet
+                which parses and interprets css. There are some special considerations in the XSL to
+                handle differences between HTML css and XSL FO style attributes. Every attempt is
+                made to keep the XSL FO and resulting PDF output as close as possible to the
+                css/browser representation.</p>
+            <p onclick="$('#hideme').toggle('display');">The solution also takes into account hidden
+                items, those with "display" attribute to "none". These items are not extracted to
+                the print file. Clicking this
+                                paragraph<footnote><sup>1</sup><footnote-body><block><sup>1</sup>
+                            The paragraph is a large gray paragraph in the sample document. You may
+                            not see it here if it is toggled to
+                        <b>"display:none"</b>.</block></footnote-body></footnote> will toggle the
+                display properties of the following paragraph.</p>
+            <div id="hideme">
+                <p class="psample">I am a test paragraph!</p>
+            </div>
+            <p>Note also that some other attributes you can use within the HTML that have no effect
+                on the appearance of the page can also be used. For instance, you can use the css
+                attribute "page-break-before" to start a new page.</p>
+            <h2 id="Print_Media">Print Media</h2>
+            <p>This solution also supports various aspects of print media. The print media
+                stylesheet is applied to the data before sending it to be processed and as such, you
+                can affect various style changes as well as inject page information this way. Some
+                browsers fully support CSS3 print media @page attributes while others do not.
+                However, the system was created so you can either use @page or you can specify in
+                code.</p>
+            <p class="noprint psample">This paragraph will not print in the output because it's
+                class is set to "noprint" and the print media css used sets all "noprint" elements
+                to "display:none".</p>
+            <div id="structures">
+                <h2 id="Headings" class="break">
+                    <input class="noprint" name="structures" type="checkbox">
+                    <a class="noprint nodec" id="printit" href="#"
+                        onclick="return xepOnline.Formatter.Format('structures',{pageMargin:'0.5in'});"
+                            ><img src="Images/button-print.png" />
+                    </a>Headings</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Headings, Block Structures and Inlines</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
+                <h3>Heading level 3 without any specific style changes</h3>
+                <h4>Heading Level 4</h4>
+                <h5>Heading Level 5</h5>
+                <h6>Heading Level 6</h6>
+                <h2 id="Other_Block-level_Structures">Other Block-level Structures</h2>
+                <p>The following shows various block-level structures, some with standard HTML
+                    interpretation of the style and other with css styling applied to augment/change
+                    the formatting.</p>
+                <p class="psample">This is a paragraph with some CSS styling applied</p>
+                <blockquote>This is the standard &lt;blockquote&gt; element. It provides an indented
+                    look to the text. This is rarely used in the days of &lt;div&gt; elements,
+                    classes and css styling but it is supported.</blockquote>
+                <pre>This is the standard &lt;pre&gt; element. Again, most folks would use
+css to style output like this, but for old HTML compatibility 
+we support the "pre" element.</pre>
+                <div class="alert-box notice"><span>Notice: </span>Throughout this document, "alert"
+                    boxes like this are used to convey information to you. In fact, this is a great
+                    example showing mapping css styles to formatting. It includes using border,
+                    colors, fonts and background-images all with css styles.</div>
+                <h2 id="Inline_Elements">Inline Elements</h2>
+                <p>Testing some <i>inline</i> elements. There are some elements still used like
+                        <b>"b" for bold</b> and <i>"i" for italic</i>. They can even be combined
+                    like <b><i><u>bold italic underline</u></i></b>. The more modern approach of
+                    using <span class="testspan">&lt;span&gt; with classes and css</span> is also
+                    supported. A variety of other elements supported like the <q>quote element</q>
+                        even<sup>superscripts</sup> and<sub>subscripts.</sub></p>
+                <div class="alert-box error"><span>Exception: </span>Underline using the css style
+                    "text-decoration" in Chrome is not yet supported through to the PDF. It does not
+                    export the "text-decoration" attribute and instead uses a strange "0px" border
+                    construct that only Chrome interprets as an underline. The above css style for
+                    underline in Chrome is represented as "border: 0px none rgb(51, 252,
+                    243)".</div>
+            </div>
+            <div id="tablediv">
+                <h2 id="Tables">
+                    <input class="noprint" name="tablediv" type="checkbox">
+                        <a class="noprint nodec" id="printit" href="#"
+                        onclick="return xepOnline.Formatter.Format('tablediv',{pageMargin:'0.5in'});"
+                            ><img src="Images/button-print.png" />
+                    </a>Tables</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Tables</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
+                <p><b>Tables</b>: This section tests various tabular structures including borders,
+                    colors and spanning.</p>
+                <div class="alert-box notice"><span>Notice: </span>You can use the elements
+                    &lt;thead&gt; and &lt;tfoot&gt; in your HTML to mark areas of the table to be
+                    treated in XSL FO as table-header and table-footer. These would repeat at page
+                    breaks.</div>
+                <table border="1px solid black" width="100%">
+                    <tr>
+                        <th>Heading 1</th>
+                        <th class="redcell">Heading 2</th>
+                        <th>Heading 3</th>
+                    </tr>
+                    <tr>
+                        <td>Body Cell 1</td>
+                        <td class="redtext">Body Cell 2</td>
+                        <td class="center">Body Cell 3</td>
+                    </tr>
+                    <tr>
+                        <td>Body Cell 1</td>
+                        <td class="bigborder">Body Cell 2</td>
+                        <td class="center">Body Cell 3</td>
+                    </tr>
+                    <tr>
+                        <td class="center" colspan="3">Body Cell 1</td>
+                    </tr>
+                    <tr>
+                        <td>Body Cell 1</td>
+                        <td>Body Cell 2</td>
+                        <td class="center" rowspan="2">Body Cell 3</td>
+                    </tr>
+                    <tr>
+                        <td>Body Cell 1</td>
+                        <td>Body Cell 2</td>
+                    </tr>
+
+                </table>
+                <p>A fancier table with all CSS styling. Also note that this table implements
+                    "thead" and "tbody" which map to the appropriate XSL FO constructs so that the
+                    table header and table footer is repeated at a break in the page.</p>
+                <table id="customers">
+                    <thead>
+                        <tr>
+                            <th>Company Header</th>
+                            <th>Contact Header</th>
+                            <th>Country Header</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Company Footer</th>
+                            <th>Contact Footer</th>
+                            <th>Country Footer</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <tr>
+                            <td>Alfreds Futterkiste</td>
+                            <td>Maria Anders</td>
+                            <td>Germany</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Berglunds snabbköp</td>
+                            <td>Christina Berglund</td>
+                            <td>Sweden</td>
+                        </tr>
+                        <tr>
+                            <td>Centro comercial Moctezuma</td>
+                            <td>Francisco Chang</td>
+                            <td>Mexico</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Ernst Handel</td>
+                            <td>Roland Mendel</td>
+                            <td>Austria</td>
+                        </tr>
+                        <tr>
+                            <td>Island Trading</td>
+                            <td>Helen Bennett</td>
+                            <td>UK</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Königlich Essen</td>
+                            <td>Philip Cramer</td>
+                            <td>Germany</td>
+                        </tr>
+                        <tr>
+                            <td>Laughing Bacchus Winecellars</td>
+                            <td>Yoshi Tannamuri</td>
+                            <td>Canada</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Magazzini Alimentari Riuniti</td>
+                            <td>Giovanni Rovelli</td>
+                            <td>Italy</td>
+                        </tr>
+                        <tr>
+                            <td>North/South</td>
+                            <td>Simon Crowther</td>
+                            <td>UK</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Paris spécialités</td>
+                            <td>Marie Bertrand</td>
+                            <td>France</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="tablediv">
+                <h2 id="Lists">
+                    <input class="noprint" name="tablediv" type="checkbox">
+                        <a class="noprint nodec" id="printit" href="#"
+                        onclick="return xepOnline.Formatter.Format('listdiv',{pageMargin:'0.5in'});"
+                            ><img src="Images/button-print.png" />
+                    </a>Lists</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Lists</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
+                <div class="alert-box error"><span>Exception: </span>Lists in HTML (can) carry an
+                    attribute that indicates the style for the list (like decimal, upper-roman,
+                    disk, square, etc.) In HTML this style is inherited from parent lists to child
+                    lists unless the style is changed. There is no equivalent to this in XSL FO. The
+                    current implementation maps inherited styles but has some issues in assumed
+                    ones.</div>
+                <div class="alert-box notice">
+                    <span>Note: </span>
+                    <p>There are many list styles in HTML. Currently this solution supports the
+                        following:</p>
+                    <ul>
+                        <li>Bullet Lists: <ul>
+                                <li>disk</li>
+                                <li>square</li>
+                                <li>circle</li>
+                            </ul>
+                        </li>
+                        <li>Numbered Lists: <ul>
+                                <li>decimal</li>
+                                <li>decimal-leading-zero</li>
+                                <li>lower-alpha</li>
+                                <li>lower-latin</li>
+                                <li>lower-romwn</li>
+                                <li>upper-alpha</li>
+                                <li>upper-latin</li>
+                                <li>upper-romwn</li>
+                            </ul>
+                        </li>
+                        <li>Other: <ul>
+                                <li>none</li>
+                            </ul></li>
+                    </ul>
+                </div>
+                <h3 id="Bullet-style_Lists">Bullet-style Lists</h3>
+                <p>Testing un-numbered lists, first a simple list</p>
+                <ul>
+                    <li>One</li>
+                    <li>Two</li>
+                    <li>Three</li>
+                </ul>
+                <p>Another list with list-style-type setting in CSS</p>
+                <ul class="square">
+                    <li>One</li>
+                    <li>Two</li>
+                    <li>Three</li>
+                </ul>
+                <p>Now, nested lists</p>
+                <ul>
+                    <li>One</li>
+                    <li>A list inside the other list <ul>
+                            <li>Level 2 bullet</li>
+                            <li>A list inside the other list <ul>
+                                    <li>Level 2 bullet</li>
+                                    <li>A list inside the other list <ul>
+                                            <li>Level 2 bullet</li>
+                                            <li>Level 2 bullet</li>
+                                            <li>Level 2 bullet</li>
+                                        </ul>
+                                    </li>
+                                    <li>Level 2 bullet</li>
+                                </ul>
+                            </li>
+                            <li>Level 2 bullet</li>
+                        </ul>
+                    </li>
+                    <li>Three</li>
+                </ul>
+                <h3 id="Numbered_Lists">Numbered Lists</h3>
+                <p>Testing the same lists as above, numbered, first a simple list</p>
+                <ol>
+                    <li>One</li>
+                    <li>Two</li>
+                    <li>Three</li>
+                </ol>
+                <p>Another set of lists with list-style-type setting in CSS</p>
+                <ol class="lower-alpha">
+                    <li>One</li>
+                    <li>Two</li>
+                    <li>Three</li>
+                </ol>
+                <ol class="upper-roman">
+                    <li>One</li>
+                    <li>Two</li>
+                    <li>Three</li>
+                </ol>
+                <ol class="lower-roman">
+                    <li>One</li>
+                    <li>Two</li>
+                    <li>Three</li>
+                </ol>
+                <p>Now, nested lists</p>
+                <ol>
+                    <li>One</li>
+                    <li>A list inside the other list <ol>
+                            <li>Level 2 bullet</li>
+                            <li>A list inside the other list <ol>
+                                    <li>Level 2 bullet</li>
+                                    <li>A list inside the other list <ol>
+                                            <li>Level 2 bullet</li>
+                                            <li>Level 2 bullet</li>
+                                            <li>Level 2 bullet</li>
+                                        </ol>
+                                    </li>
+                                    <li>Level 2 bullet</li>
+                                </ol>
+                            </li>
+                            <li>Level 2 bullet</li>
+                        </ol>
+                    </li>
+                    <li>Three</li>
+                </ol>
+            </div>
+            <h3 id="Special_Processing">Special Processing</h3>
+            <p>A very common use of the list element in HTML is to provide specialty structures like
+                breadcrumbs or navigation tabs. While most of these structures are likely not
+                something you would want in the print output, we wanted to do as close as possible
+                representation of the HTML. These type of lists normally make use of the attribute
+                "display" set to "inline" on the list tag.</p>
+            <p>We have attempted to take this into account, mapping a list HTML tag with
+                "display:inline" differently than a normal list. This example actually is a set of
+                lists with css applied that turns that list into a breadcrumb. It also shows some
+                advanced concepts introduced later like creating links to internal destinations in
+                the document.</p>
+            <div class="bread">
+                <ul>
+                    <li>
+                        <a href="#top">XEPOnline HTML to PDF Test Document</a>
+                    </li>
+                    <ul>
+                        <li> » <a href="#Lists">Lists</a></li>
+                    </ul>
+                    <ul>
+                        <li> » <a href="#Special_Processing">Special Processing</a></li>
+                    </ul>
+                </ul>
+            </div>
+            <p>Or maybe a cool effect like a set of tabs you can drop in the document to format and
+                control the navigation.</p>
+            <div class="alert-box error"><span>Exception: </span>The css for paddings and margins
+                needs to be worked through in this example. There are differences in the way these
+                are handled between XSL FO and HTML.</div>
+            <div class="tabs">
+                <ul>
+                    <li>
+                        <a href="#top">XEPOnline HTML to PDF Test Document</a>
+                    </li>
+                    <ul>
+                        <li>
+                            <a href="#Lists">Lists</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li class="here">
+                            <a href="#Special_Processing">Special Processing</a>
+                        </li>
+                    </ul>
+                </ul>
+            </div>
+            <div id="imagediv">
+                <h2 id="Images">
+                    <input class="noprint" name="imagediv" type="checkbox">
+                        <a class="noprint nodec" id="printit" href="#"
+                        onclick="return xepOnline.Formatter.Format('imagediv',{pageMargin:'0.5in'});"
+                            ><img src="Images/button-print.png" />
+                    </a>Images</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Images</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">Test Footer</p>
+                </footer>
+                <p>Images in web pages can be linked via absolute or relative references or they can
+                    be embedded directly in the web page using a data-uri scheme. All of these
+                    methods are supported. In addition, modern browsers make signifcant use of SVG
+                    as a format that can be directly included in the page. This is why we selected
+                    XSL FO for back-end processing of the information. XSL FO and specifically
+                    XEPOnline supports SVG not by converting the SVG to an image, but by processing
+                    SVG to the output, retaining all the vector-based information.</p>
+                <h3 id="Static_SVG">Image Example #1: Static SVG</h3>
+                <p>This is a static SVG inserted directly in the HTML page.</p>
+                <p>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink" width="600px" height="100px"
+                        viewBox="0 75 910 150">
+                        <defs>
+                            <linearGradient id="#gradient_0" gradientUnits="userSpaceOnUse"
+                                gradientTransform="rotate(-50)" spreadMethod="pad" x1="20" y1="150"
+                                x2="232.866" y2="150">
+                                <stop style="stop-color: rgb(0, 21, 71); stop-opacity: 1;"
+                                    offset="0%"></stop>
+                                <stop style="stop-color: rgb(0, 20, 68); stop-opacity: 1;"
+                                    offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient id="#gradient_1" gradientUnits="userSpaceOnUse"
+                                gradientTransform="rotate(0)" spreadMethod="pad" x1="20" y1="150"
+                                x2="232.866" y2="150">
+                                <stop style="stop-color: rgb(255, 255, 255); stop-opacity: 0.29;"
+                                    offset="0%"></stop>
+                                <stop style="stop-color: rgb(255, 255, 255); stop-opacity: 0.8;"
+                                    offset="28%"></stop>
+                                <stop style="stop-color: rgb(255, 255, 255); stop-opacity: 0.16;"
+                                    offset="72%"></stop>
+                                <stop style="stop-color: rgb(255, 255, 255); stop-opacity: 0;"
+                                    offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient id="#gradient_2" gradientUnits="userSpaceOnUse"
+                                gradientTransform="rotate(45)" spreadMethod="pad" x1="20" y1="150"
+                                x2="232.866" y2="150">
+                                <stop style="stop-color: rgb(0, 21, 71); stop-opacity: 1;"
+                                    offset="0%"></stop>
+                                <stop style="stop-color: rgb(56, 98, 197); stop-opacity: 1;"
+                                    offset="19%"></stop>
+                                <stop style="stop-color: rgb(0, 19, 66); stop-opacity: 1;"
+                                    offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient id="#gradient_3" gradientUnits="userSpaceOnUse"
+                                gradientTransform="rotate(-50)" spreadMethod="pad" x1="20" y1="150"
+                                x2="232.866" y2="150">
+                                <stop style="stop-color: rgb(185, 186, 189); stop-opacity: 1;"
+                                    offset="0%"></stop>
+                                <stop style="stop-color: rgb(155, 156, 160); stop-opacity: 1;"
+                                    offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient id="#gradient_4" gradientUnits="userSpaceOnUse"
+                                gradientTransform="rotate(45)" spreadMethod="pad" x1="20" y1="150"
+                                x2="232.866" y2="150">
+                                <stop style="stop-color: rgb(185, 186, 189); stop-opacity: 1;"
+                                    offset="0%"></stop>
+                                <stop style="stop-color: rgb(165, 165, 168); stop-opacity: 1;"
+                                    offset="19%"></stop>
+                                <stop style="stop-color: rgb(117, 118, 121); stop-opacity: 1;"
+                                    offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient id="#gradient_5" gradientUnits="userSpaceOnUse"
+                                gradientTransform="rotate(-50)" spreadMethod="pad" x1="20" y1="150"
+                                x2="232.866" y2="150">
+                                <stop style="stop-color: rgb(96, 118, 128); stop-opacity: 1;"
+                                    offset="0%"></stop>
+                                <stop style="stop-color: rgb(87, 106, 116); stop-opacity: 1;"
+                                    offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient id="#gradient_6" gradientUnits="userSpaceOnUse"
+                                gradientTransform="rotate(45)" spreadMethod="pad" x1="20" y1="150"
+                                x2="232.866" y2="150">
+                                <stop style="stop-color: rgb(96, 118, 128); stop-opacity: 1;"
+                                    offset="0%"></stop>
+                                <stop style="stop-color: rgb(128, 144, 152); stop-opacity: 1;"
+                                    offset="19%"></stop>
+                                <stop style="stop-color: rgb(75, 92, 100); stop-opacity: 1;"
+                                    offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient id="#gradient_7" gradientUnits="userSpaceOnUse"
+                                gradientTransform="rotate(-50)" spreadMethod="pad" x1="20" y1="150"
+                                x2="232.866" y2="150">
+                                <stop style="stop-color: rgb(231, 231, 232); stop-opacity: 1;"
+                                    offset="0%"></stop>
+                                <stop style="stop-color: rgb(186, 186, 188); stop-opacity: 1;"
+                                    offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient id="#gradient_8" gradientUnits="userSpaceOnUse"
+                                gradientTransform="rotate(45)" spreadMethod="pad" x1="20" y1="150"
+                                x2="232.866" y2="150">
+                                <stop style="stop-color: rgb(231, 231, 232); stop-opacity: 1;"
+                                    offset="0%"></stop>
+                                <stop style="stop-color: rgb(186, 186, 188); stop-opacity: 1;"
+                                    offset="19%"></stop>
+                                <stop style="stop-color: rgb(126, 126, 129); stop-opacity: 1;"
+                                    offset="100%"></stop>
+                            </linearGradient>
+                        </defs>
+                        <g transform="translate(0) rotate(0)">
+                            <g>
+                                <g transform="translate(20 20) rotate(0)">
+                                    <g></g>
+                                    <g></g>
+                                    <g>
+                                        <g></g>
+                                        <g>
+                                            <g cursor="pointer">
+                                                <path
+                                                  style="fill: rgb(0, 19, 66); fill-opacity: 1; stroke: none;"
+                                                  d="M 113.53 116.397 L 113.53 135.749 L 113.53 116.397 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path
+                                                  style="fill: rgb(0, 19, 66); fill-opacity: 1; stroke: none;"
+                                                  d="M 113.53 116.397 L 16.7728 116.397 L 16.7728 135.749 L 113.53 135.749 L 113.53 116.397 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path
+                                                  style="fill: rgb(134, 134, 137); fill-opacity: 1; stroke: none;"
+                                                  d="M 96.9164 120.144 L 0.159328 120.144 L 0.159328 139.495 L 96.9164 139.495 L 96.9164 120.144 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path fill="url(##gradient_8)" style="stroke: none;"
+                                                  d="M 6.47998 135.622 A 96.7571 43.5407 0 0 1 0.159328 120.144 L 0.159328 139.495 A 96.7571 43.5407 0 0 0 6.47998 154.974 L 6.47998 135.622 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path
+                                                  style="fill: rgb(134, 134, 137); fill-opacity: 1; stroke: none;"
+                                                  d="M 96.9164 120.144 L 6.47998 135.622 L 6.47998 154.974 L 96.9164 139.495 L 96.9164 120.144 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path
+                                                  style="fill: rgb(76, 93, 102); fill-opacity: 1; stroke: none;"
+                                                  d="M 98.1826 121.632 L 7.74618 137.11 L 7.74618 156.462 L 98.1826 140.983 L 98.1826 121.632 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path fill="url(##gradient_6)" style="stroke: none;"
+                                                  d="M 26.4696 150.861 A 96.7571 43.5407 0 0 1 7.74618 137.11 L 7.74618 156.462 A 96.7571 43.5407 0 0 0 26.4696 170.213 L 26.4696 150.861 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path
+                                                  style="fill: rgb(76, 93, 102); fill-opacity: 1; stroke: none;"
+                                                  d="M 98.1826 121.632 L 26.4696 150.861 L 26.4696 170.213 L 98.1826 140.983 L 98.1826 121.632 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path
+                                                  style="fill: rgb(121, 122, 126); fill-opacity: 1; stroke: none;"
+                                                  d="M 102.177 123.267 L 30.4637 152.497 L 30.4637 171.848 L 102.177 142.618 L 102.177 123.267 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path fill="url(##gradient_4)" style="stroke: none;"
+                                                  d="M 94.8209 166.682 A 96.7571 43.5407 0 0 1 30.4637 152.497 L 30.4637 171.848 A 96.7571 43.5407 0 0 0 94.8209 186.033 L 94.8209 166.682 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path
+                                                  style="fill: rgb(121, 122, 126); fill-opacity: 1; stroke: none;"
+                                                  d="M 102.177 123.267 L 94.8209 166.682 L 94.8209 186.033 L 102.177 142.618 L 102.177 123.267 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path
+                                                  style="fill: rgb(0, 19, 66); fill-opacity: 1; stroke: none;"
+                                                  d="M 113.53 116.397 L 106.174 159.812 L 106.174 179.163 L 113.53 135.749 L 113.53 116.397 Z"
+                                                ></path>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <path fill="url(##gradient_2)" style="stroke: none;"
+                                                  d="M 210.287 116.397 A 96.7571 43.5407 0 0 1 106.174 159.812 L 106.174 179.163 A 96.7571 43.5407 0 0 0 210.287 135.749 L 210.287 116.397 Z"
+                                                ></path>
+                                            </g>
+                                        </g>
+                                        <g>
+                                            <g cursor="pointer">
+                                                <g>
+                                                  <path fill="url(##gradient_0)"
+                                                  style="stroke: none;"
+                                                  d="M 113.53 116.397 L 106.174 159.812 A 96.7571 43.5407 0 1 0 16.7728 116.397 L 113.53 116.397 Z"
+                                                  ></path>
+                                                </g>
+                                                <g></g>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <g>
+                                                  <path fill="url(##gradient_3)"
+                                                  style="stroke: none;"
+                                                  d="M 102.177 123.267 L 30.4637 152.497 A 96.7571 43.5407 0 0 0 94.8209 166.682 L 102.177 123.267 Z"
+                                                  ></path>
+                                                </g>
+                                                <g></g>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <g>
+                                                  <path fill="url(##gradient_5)"
+                                                  style="stroke: none;"
+                                                  d="M 98.1826 121.632 L 7.74618 137.11 A 96.7571 43.5407 0 0 0 26.4696 150.861 L 98.1826 121.632 Z"
+                                                  ></path>
+                                                </g>
+                                                <g></g>
+                                            </g>
+                                            <g cursor="pointer">
+                                                <g>
+                                                  <path fill="url(##gradient_7)"
+                                                  style="stroke: none;"
+                                                  d="M 96.9164 120.144 L 0.159328 120.144 A 96.7571 43.5407 0 0 0 6.47998 135.622 L 96.9164 120.144 Z"
+                                                  ></path>
+                                                </g>
+                                                <g></g>
+                                            </g>
+                                        </g>
+                                        <g></g>
+                                        <g cursor="pointer"></g>
+                                        <g cursor="pointer"></g>
+                                        <g cursor="pointer"></g>
+                                        <g cursor="pointer"></g>
+                                    </g>
+                                    <g>
+                                        <g></g>
+                                    </g>
+                                    <g></g>
+                                    <g></g>
+                                </g>
+                                <g>
+                                    <g transform="translate(239.866 20) rotate(0)">
+                                        <g>
+                                            <path style="fill: none; stroke: none;"
+                                                d="M 0 0 L 640.134 0 L 640.134 260 L 0 260 L 0 0 Z"></path>
+                                            <path style="fill: none; stroke: none;"
+                                                d="M 0 0 L 640.134 0 L 640.134 260 L 0 260 L 0 0 Z"
+                                            ></path>
+                                        </g>
+                                        <g transform="translate(10 70) rotate(0)">
+                                            <g>
+                                                <g></g>
+                                                <g transform="translate(0) rotate(0)">
+                                                  <g transform="translate(0 3.62979) rotate(0)">
+                                                  <rect style="fill: rgb(0, 21, 71); stroke: none;"
+                                                  x="0" y="0" width="20" height="10"></rect>
+                                                  </g>
+                                                  <g transform="translate(24) rotate(0)">
+                                                  <g transform="translate(0) rotate(0)">
+                                                  <g></g>
+                                                  <text font-family="helveticaneue-bold"
+                                                  font-size="15" font-weight="bold"
+                                                  fill="rgb(35, 35, 35)" pointer-events="none"
+                                                  stroke="none" x="1" y="1"><tspan x="1" dy="1em"
+                                                  >Cash Compensation - $105,400,000</tspan></text>
+                                                  </g>
+                                                  </g>
+                                                </g>
+                                                <g transform="translate(0 27.2596) rotate(0)">
+                                                  <g transform="translate(0 3.62979) rotate(0)">
+                                                  <rect
+                                                  style="fill: rgb(185, 186, 189); stroke: none;"
+                                                  x="0" y="0" width="20" height="10"></rect>
+                                                  </g>
+                                                  <g transform="translate(24) rotate(0)">
+                                                  <g transform="translate(0) rotate(0)">
+                                                  <g></g>
+                                                  <text font-family="helveticaneue-bold"
+                                                  font-size="15" font-weight="bold"
+                                                  fill="rgb(35, 35, 35)" pointer-events="none"
+                                                  stroke="none" x="1" y="1"><tspan x="1" dy="1em"
+                                                  >Health &amp; Welfare Benefits -
+                                                  $16,700,000</tspan></text>
+                                                  </g>
+                                                  </g>
+                                                </g>
+                                                <g transform="translate(0 54.5191) rotate(0)">
+                                                  <g transform="translate(0 3.62979) rotate(0)">
+                                                  <rect
+                                                  style="fill: rgb(96, 118, 128); stroke: none;"
+                                                  x="0" y="0" width="20" height="10"></rect>
+                                                  </g>
+                                                  <g transform="translate(24) rotate(0)">
+                                                  <g transform="translate(0) rotate(0)">
+                                                  <g></g>
+                                                  <text font-family="helveticaneue-bold"
+                                                  font-size="15" font-weight="bold"
+                                                  fill="rgb(35, 35, 35)" pointer-events="none"
+                                                  stroke="none" x="1" y="1"><tspan x="1" dy="1em"
+                                                  >Retirement Benefits - $8,200,000</tspan></text>
+                                                  </g>
+                                                  </g>
+                                                </g>
+                                                <g transform="translate(0 81.7787) rotate(0)">
+                                                  <g transform="translate(0 3.62979) rotate(0)">
+                                                  <rect
+                                                  style="fill: rgb(231, 231, 232); stroke: none;"
+                                                  x="0" y="0" width="20" height="10"></rect>
+                                                  </g>
+                                                  <g transform="translate(24) rotate(0)">
+                                                  <g transform="translate(0) rotate(0)">
+                                                  <g></g>
+                                                  <text font-family="helveticaneue-bold"
+                                                  font-size="15" font-weight="bold"
+                                                  fill="rgb(35, 35, 35)" pointer-events="none"
+                                                  stroke="none" x="1" y="1"><tspan x="1" dy="1em"
+                                                  >Government Benefits - $8,000,000</tspan></text>
+                                                  </g>
+                                                  </g>
+                                                </g>
+                                                <g transform="translate(0 109.038) rotate(0)">
+                                                  <g transform="translate(0 3.62979) rotate(0)">
+                                                  <rect style="fill: none; stroke: none;" x="0"
+                                                  y="0" width="20" height="10"></rect>
+                                                  </g>
+                                                  <g transform="translate(24) rotate(0)">
+                                                  <g transform="translate(0) rotate(0)">
+                                                  <g></g>
+                                                  </g>
+                                                  </g>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g opacity="0.15"
+                                        transform="translate(58.0749 107.837) rotate(0)">
+                                        <g transform="translate(0) rotate(0)">
+                                            <g></g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                            <g transform="translate(20 20) rotate(0)"></g>
+                            <g transform="translate(423.855 144.245) rotate(0)"></g>
+                        </g>
+                    </svg>
+                </p>
+                <h3 id="Linked_PNG">Image Example #2: Linked PNG</h3>
+                <p>This is a PNG inserted using "src" attribute of the "img" tag. When formatting,
+                    XEPOnline needs to be able to access the image in question so the path of the
+                    web page is sent using xml:base to provide XEPOnline with the ability to resolve
+                    the path to the image. </p>
+                <div class="alert-box notice"><span>Notice: </span>Since XEPOnline is an REST-based
+                    remote service, it will not be able to access the images if you are testing on a
+                    localhost system. If you choose, you can implement custom javascript that
+                    base-64 encodes images and injects them into the &lt;img&gt; tag's "src"
+                    attribute and eliminate the need for XEPOnline to reach back to your server for
+                    the image assets.</div>
+                <p>Processing the &lt;img&gt; also requires special handling because HTML5 allows
+                    non-closed tags. Since XSL FO is an XML-based processing solution, the XEPOnline
+                    javascript handles this by creating valid XML first before submitting. </p>
+                <p>Take special care if using auto-scaling of images. If you desire an exact size of
+                    the image, it should be specified in the HTML or css. The width is carried
+                    through to the PDF. The following two images are one locally referenced on the
+                    submit website and the same image remotely referenced.</p>
+                <p>
+                    <img src="Images/RC-logo.png" alt="logo" width="300px" /><img
+                        src="http://www.riocrest.com/Resources/img/logo.png" alt="logo"
+                        width="300px" />
+                </p>
+                <h3 id="Base-64_Image">Image Example #3: Base-64 Encoded Images Using data: URI</h3>
+                <p><img
+                        src="data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub/
+                    /ge8WSLf/rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcpp
+                    V0aCcGCmTIHEIUEqjgaORCMxIC6e0CcguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7"
+                        width="16px" height="14px" alt="embedded folder icon" /> This image of a
+                    folder icon is directly in the web page as base-64 encoded.</p>
+                <h3 id="SVG_Charting">Image Example #4: Dynamic, Javascript-based SVG Charting</h3>
+                <p>The following chart is dynamically generated using Anychart JavaScript library.
+                    This shows that even page-based dynamic information can be sent to the engine
+                    after processing in its full SVG format. There is not pre-processing of this SVG
+                    to image format at any time. The full vector information is carried through to
+                    the PDF.</p>
+                <div id="anychart" style="width: 800px; height:600px;"></div>
+                <h3 id="SVG_Charting">Image Example #5: Dynamic, Javascript-based SVG Charting
+                    II</h3>
+                <p onclick="changeData();">The following chart is dynamically generated using d3
+                    JavaScript library. You can even see that dynamic SVG is printed as it exists at
+                    any time. This sample is dynamic, click this paragraph and the pie chart data
+                    changes. The print file will represent what is on the screen at that time.</p>
+                <div class="d3" id="d3donut"></div>
+            </div>
+            <div id="hyperdiv">
+                <h2 id="Hyperlinks">
+                    <input class="noprint" name="hyperdiv" type="checkbox">
+                        <a class="noprint nodec" id="printit" href="#"
+                        onclick="return xepOnline.Formatter.Format('hyperdiv',{pageMargin:'0.5in'});"
+                            ><img src="Images/button-print.png" />
+                    </a>Hyperlinks</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Hyperlinks</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
+                <p>Hyperlinks can be carried into the output PDF. </p>
+                <h3 id="External">External</h3>
+                <p>This link should go to the <a href="http://online.xep.com">XEPOnline</a> web
+                    site. </p>
+                <h3 id="Internal">Internal</h3>
+                <p>Links can also point to internal destinations which are carried through to the
+                    PDF. Using many of the concepts above, you could create a list that is the
+                    document table of contents styled with css to add images and control
+                    appearance.</p>
+                <div class="alert-box notice"><span>Notice: </span>Obviously if you are generating
+                    internal links you should make sure that all the destinations in question are in
+                    the document. This sample has links outside of this section and therefore these
+                    will not work if you use only the section print function.</div>
+                <ul class="toc">
+                    <li>
+                        <a href="#top">XEPOnline HTML to PDF Test Document</a>
+                        <ul class="toc">
+                            <li>
+                                <a href="#Why">Why Did We Develop This?</a>
+                            </li>
+                            <li>
+                                <a href="#How_it_Works">How it Works</a>
+                            </li>
+                            <li>
+                                <a href="#Currently_Supported_Elements">Currently Supported
+                                    Elements</a>
+                            </li>
+                            <li>
+                                <a href="#Style_Handling">Style Handling</a>
+                            </li>
+                            <li>
+                                <a href="#Headings">Headings</a>
+                            </li>
+                            <li>
+                                <a href="#Other_Block-level_Structures">Other Block-level
+                                    Structures</a>
+                            </li>
+                            <li>
+                                <a href="#Inline_Elements">Inline Elements</a>
+                            </li>
+                            <li>
+                                <a href="#Tables">Tables</a>
+                            </li>
+                            <li>
+                                <a href="#Lists">Lists</a>
+                                <ul class="toc">
+                                    <li>
+                                        <a href="#Bullet-style_Lists">Bullet-style Lists</a>
+                                    </li>
+                                    <li>
+                                        <a href="Numbered_Lists">Numbered Lists</a>
+                                    </li>
+                                    <li>
+                                        <a href="#Special_Processing">Special Processing</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#Images">Images</a>
+                                <ul class="toc">
+                                    <li>
+                                        <a href="#Static_SVG">Static SVG</a>
+                                    </li>
+                                    <li>
+                                        <a href="#Linked_PNG">Linked PNG</a>
+                                    </li>
+                                    <li>
+                                        <a href="#Base-64_Image">Base-64 Image</a>
+                                    </li>
+                                    <li>
+                                        <a href="#SVG_Charting">Dynamic, Javascript-based SVG
+                                            Charting</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#Hyperlinks">Hyperlinks</a>
+                                <ul class="toc">
+                                    <li>
+                                        <a href="#External">External</a>
+                                    </li>
+                                    <li>
+                                        <a href="#Internal">Internal</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div id="floatingdiv">
+                <h2 id="Floats">
+                    <input class="noprint" name="floatingdiv" type="checkbox">
+                        <a class="noprint nodec" id="printit" href="#"
+                        onclick="return xepOnline.Formatter.Format('floatingdiv',{pageMargin:'0.5in'});"
+                            ><img src="Images/button-print.png" />
+                    </a>Floating Content</h2>
+                <header style="display:none; margin-top:60px;">
+                    <table>
+                        <tr>
+                            <td>Floats</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
+                <p>Many current implementations in HTML make use of responsive designs. The
+                    challenge is to try and replicate this HTML into the printed page. The trigger
+                    here is the float element. We will start with an easy example, how about
+                    replicating a drop-cap.</p>
+                <div>
+                    <div
+                        style="float: left; width: 25px; display:block; text-align: center; font-weight:bold; font-size: 30px;"
+                        >T</div> his would be a good example of a floating container. A drop capital
+                    is frequently used in book publishing. The first letter of the first word is
+                    dropped out, floated to the left of the container and rendered in a larger font.
+                    Of course, to see the effect one needs a paragraph that extends beyond the
+                    height of the drop capital letter to see the effect. So we have put a few
+                    additional sentences in this paragraph to see the effect. </div>
+                <p>Now, a slightly more complex design that one would expect from a javascript
+                    solution like Twitter Bootstrap would appear like this. We are directly writing
+                    the styles and not using Twitter Bootstrap for testing purposes.</p>
+                <div style="display: block; margin-left:-15px;">
+                    <div style="float:left; margin: 0px 15px; width: 31%; ">
+                        <h3>Heading for Column 1</h3>
+                        <p>This is a bunch of text in the column. This is a bunch of text in the
+                            column. This is a bunch of text in the column. This is a bunch of text
+                            in the column. This is a bunch of text in the column. This is a bunch of
+                            text in the column. This is a bunch of text in the column. This is a
+                            bunch of text in the column. This is a bunch of text in the column. This
+                            is a bunch of text in the column. This is a bunch of text in the column.
+                        </p>
+                    </div>
+                    <div style="float:left; margin: 0px 15px; width: 31%; ">
+                        <h3>Heading for Column 2</h3>
+                        <p>This is a bunch of text in the column. This is a bunch of text in the
+                            column. This is a bunch of text in the column. This is a bunch of text
+                            in the column. This is a bunch of text in the column. This is a bunch of
+                            text in the column. This is a bunch of text in the column. This is a
+                            bunch of text in the column. This is a bunch of text in the column. This
+                            is a bunch of text in the column. This is a bunch of text in the column.
+                        </p>
+                    </div>
+                    <div style="float:left; margin: 0px 15px; width: 31%; ">
+                        <h3>Heading for Column 3</h3>
+                        <p>This is a bunch of text in the column. This is a bunch of text in the
+                            column. This is a bunch of text in the column. This is a bunch of text
+                            in the column. This is a bunch of text in the column. This is a bunch of
+                            text in the column. This is a bunch of text in the column. This is a
+                            bunch of text in the column. This is a bunch of text in the column. This
+                            is a bunch of text in the column. This is a bunch of text in the column.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both; page-break-before: always" id="customdiv">
+                <h2 id="Custom">
+                    <input class="noprint" name="customdiv" type="checkbox">
+                        <a class="noprint nodec" id="printit" href="#"
+                    onclick="return xepOnline.Formatter.Format('customdiv',{pageMargin:'0.5in'});"
+                            ><img src="Images/button-print.png" />
+                    </a>Custom Tips and Tricks</h2>
+                <header style="display:none; margin-top:60px;" page-background="Images/secret.pdf">
+                    <table>
+                        <tr>
+                            <td>Custom Tips &amp; Tricks</td>
+                            <td style="text-align:right">Xportability</td>
+                        </tr>
+                    </table>
+                </header>
+                <footer style="display:none">
+                    <p class="foot">XEPOnline "Live" User Documentation and Samples</p>
+                </footer>
+                <h3>Pass-Through XSL FO Styling</h3>
+                <p style="color: brown; text-align:justify;"
+                    fostyle="text-align-last: left; font-stretch: wider; font-size-adjust:0.6; hyphenate: true; color:rgb-icc (255, 255, 0, #CMYK, .1, .2, .7, .5);"
+                    >In some instances you may wish to pass through XSL FO attributes that are not
+                    supported in HTML. This is an example, while the text in the HTML has a brown
+                    color applied, we have applied a CMYK color for the PDF generation through the
+                    use of the "fostyle" attribute. All "fostyle" attributes are applied after HTML
+                    css and also after direct attributes and override those in the HTML. This
+                    paragraph also has "text-align" justify in the HTML and font-stretch,
+                    font-size-adjust and hyphenate only in the PDF output. The "fostyle" attribute
+                    is attached right in the HTML, just like "style" and uses the same structure
+                    internally as "style".</p>
+                <h3>Footnotes</h3>
+                <p>Since HTML supports arbitrary XML inside the markup, one of the easiest ways to
+                    do some simple footnotes is to simply use the regular XSL FO
+                            markup<footnote><sup>1</sup><footnote-body><block><sup>1</sup> This is a
+                                    <b>sample footnote</b> in the body of the document. <span
+                                    style="color:red;">The css shows the footnote on mouseover and
+                                    the PDF will render as a footnote.</span> Because the css is
+                                tuned for mouseover display, the HTML css for the structure is
+                                discarded but you can use &lt;span&gt; to style the output to
+                                PDF.</block></footnote-body></footnote> for a footnote. This
+                    paragraph is an example of this technique. The XEPOnline stylesheets have
+                    implemented the footnote structure, will recognize it and transfer it to the
+                    backend. You would implement inside the html as:</p>
+                <pre>&lt;footnote&gt;
+    &lt;sup&gt;your character here for inside the HTML&lt;/sup&gt;
+    &lt;footnote-body&gt;
+        &lt;block&gt;
+            &lt;sup&gt;optional footnote char here for inside print footnote&lt;/sup&gt;
+            your inline HTML markup here for footnote formatting 
+            in PDF. Only inline styles (b, i, span) are supported in the css
+            provided for footnotes. Of course, you can implement
+            your own.
+        &lt;/block&gt;
+    &lt;/footnote-body&gt;
+&lt;footnote&gt;</pre>
+                <h3>Custom XML in Web Page</h3>
+                <p>With today's browser technology, you can use css to style any content you wish.
+                    This includes any generic XML inserted into the HTML file. For example, consider
+                    that you just wish to place the sales data through some dynamic process into a
+                    table. If you examine the source HTML for this page here, you will see only XML.
+                    It is 100% styled with external css in the file named "xmlsamp.css".</p>
+                <StmtSum>
+                    <TableHeader>
+                        <ProdDes> Account Description </ProdDes>
+                        <AcctNum>Account Number</AcctNum>
+                        <Bal>Balance</Bal>
+                        <NName>NName</NName>
+                        <PlId>Policy ID</PlId>
+                        <ProdGrp>Product Group</ProdGrp>
+                        <RspFlg>Flag</RspFlg>
+                    </TableHeader>
+                    <TableRows>
+                        <AcctSum>
+                            <ProdDes> Investment Savings Account </ProdDes>
+                            <AcctNum>3003747305</AcctNum>
+                            <Bal>$15,998.45</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>SAV</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum class="alt">
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3500462605</AcctNum>
+                            <Bal>$43,097.63</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum>
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3500628788</AcctNum>
+                            <Bal>$15,413.42</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum class="alt">
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3501134125</AcctNum>
+                            <Bal>$10,728.14</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum>
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3501244435</AcctNum>
+                            <Bal>$10,744.40</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum class="alt">
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3502110030</AcctNum>
+                            <Bal>$12,385.05</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum>
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3502130256</AcctNum>
+                            <Bal>$15,481.32</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum class="alt">
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3502284665</AcctNum>
+                            <Bal>$10,362.26</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum>
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3502284702</AcctNum>
+                            <Bal>$15,543.39</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum class="alt">
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3502798416</AcctNum>
+                            <Bal>$20,000.00</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum>
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3502798430</AcctNum>
+                            <Bal>$20,000.00</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum class="alt">
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3502801909</AcctNum>
+                            <Bal>$25,000.00</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum>
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3503119658</AcctNum>
+                            <Bal>$16,000.00</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum class="alt">
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3503183512</AcctNum>
+                            <Bal>$29,273.21</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum>
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3503190978</AcctNum>
+                            <Bal>$55,756.26</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum class="alt">
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3505007720</AcctNum>
+                            <Bal>$35,000.00</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum>
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3505014308</AcctNum>
+                            <Bal>$7,060.41</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum class="alt">
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3505025032</AcctNum>
+                            <Bal>$3,500.00</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum>
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3505025070</AcctNum>
+                            <Bal>$1,500.00</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum class="alt">
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3505043641</AcctNum>
+                            <Bal>$4,069.04</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                        <AcctSum>
+                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
+                            <AcctNum>3505363000</AcctNum>
+                            <Bal>$8,000.00</Bal>
+                            <NName></NName>
+                            <PlId></PlId>
+                            <ProdGrp>CD</ProdGrp>
+                            <RspFlg>0</RspFlg>
+                        </AcctSum>
+                    </TableRows>
+                </StmtSum>
+                <p>And this table is formatted according to the css styling, even carried through to
+                    the PDF. You so not have to change XML tags, you only indicate their style as
+                    "table" or "table-row" or "block" or "inline" in the css and XEPOnline will
+                    format the generic XML according to the css styling to print.</p>
+            </div>
+            <h2>What's Coming?</h2>
+            <p>We've done the implementation to support @media print. Would love to implement
+                page-templates (first, last, left/right). Only Chrome supports @media print @page
+                directives though. Guess that will need to wait a bit.</p>
+            <p>Next a little clean-up on the conversion to XSL FO, there are some issues pointed out
+                in this document. There is certainly more work here to do, we probably did not think
+                of everything.</p>
+            <p>After that, well we can do form fields ... a fillable HTML form to a PDF fillable
+                form ... that would be cool.</p>
+        </div>
+        <script>
+var salesData=[
+	{label:"Basic", color:"#3366CC"},
+	{label:"Plus", color:"#DC3912"},
+	{label:"Lite", color:"#FF9900"},
+	{label:"Elite", color:"#109618"},
+	{label:"Delux", color:"#990099"}
+];
+
+var svg = d3.select("#d3donut").append("svg").attr("width",700).attr("height",300).attr("xmlns", "http://www.w3.org/2000/svg")
+  .attr("xmlns:xmlns:xlink", "http://www.w3.org/1999/xlink");
+
+svg.append("g").attr("id","salesDonut");
+svg.append("g").attr("id","quotesDonut");
+
+Donut3D.draw("salesDonut", randomData(), 150, 150, 130, 100, 30, 0.4);
+Donut3D.draw("quotesDonut", randomData(), 450, 150, 130, 100, 30, 0);
+	
+function changeData(){
+	Donut3D.transition("salesDonut", randomData(), 130, 100, 30, 0.4);
+	Donut3D.transition("quotesDonut", randomData(), 130, 100, 30, 0);
+}
+
+function randomData(){
+	return salesData.map(function(d){ 
+		return {label:d.label, value:1000*Math.random(), color:d.color};});
+}
+</script>
+        <script type="text/javascript">
+
+    anychart.onDocumentReady(function() {
+        //create data set on our data
+        var dataSet = new anychart.data.Set([
+            ['P1', 162, 142, 122],
+            ['P2', 134, 154, 144],
+            ['P3', 116, 126, 116],
+            ['P4', 122, 132, 162],
+            ['P5', 178, 168, 148],
+            ['P6', 144, 154, 194],
+            ['P7', 125, 135, 145],
+            ['P8', 176, 166, 136],
+            ['P9', 156, 188, 118],
+            ['P10', 195, 120, 130],
+            ['P11', 215, 115, 155],
+            ['P12', 176, 136, 166],
+            ['P13', 167, 147, 137],
+            ['P14', 142, 172, 152],
+            ['P15', 117, 137, 177],
+            ['P16', 113, 123, 183],
+            ['P17', 132, 134, 144],
+            ['P18', 146, 146, 166],
+            ['P19', 169, 159, 189],
+            ['P20', 184, 144, 134]
+        ]);
+
+        //map data for the first series, take x from the zero column and value from the first column of data set
+        var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
+
+        //map data for the second series, take x from the zero column and value from the second column of data set
+        var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
+
+        //map data for the second series, take x from the zero column and value from the third column of data set
+        var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
+
+        //create area chart
+        chart = anychart.areaChart();
+
+        //set container id for the chart
+        chart.container('anychart');
+
+        //set chart title text settings
+        chart.title().text('100% Stacked Area Chart');
+
+        //set chart Y scale settings
+        chart.yScale()
+                .stackMode('percent') //force chart to stack series values in percentage
+                .maximum(100)         //set maximum scale value
+                .ticks()              //access to scale ticks settings , note that chaining sequence now continue from ticks object
+                .interval(10);        //set scale ticks interval
+
+
+        //set yAxis labels formatting, force it to add % to values
+        chart.yAxis(0).labels().textFormatter(function(info) {
+            return info.value + '%';
+        });
+
+        //using fill function we can create a pretty gradient for the series
+        //note that we using series sourceColor here, which can be configured separately for each series by 'color' method
+        var fillFunction = function() {
+            return {keys: [
+                {offset: 0, color: this.sourceColor},
+                {offset: 1, color: anychart.color.darken(this.sourceColor)}
+            ], angle: -90, opacity: 1};
+        };
+
+        //create first area series on mapped data and specify series fill function
+        chart.area(seriesData_1).fill(fillFunction);
+
+        //create second area series on mapped data and specify series fill function
+        chart.area(seriesData_2).fill(fillFunction);
+
+        //create third area series on mapped data, specify series fill function and color
+        chart.area(seriesData_3).color('#EEEE25').fill(fillFunction);
+
+        chart.draw();
+    });
+
+</script>
+    </body>
+</html>
