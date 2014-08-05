@@ -5,12 +5,8 @@
         <script src="js/anychart.min.js"></script>
         <script src="js/d3.min.js"></script>
         <script src="js/d3-donut.js"></script>
-        <script src="js/xepOnline.jqPlugin.004.js"></script>
+        <script src="js/xepOnline.jqPlugin.005.js"></script>
         <script>
-            xepOnline.Formatter.xsl_stylesheet_declaration = '<?xml-stylesheet type="text/xsl" href="http://xep.cloudformatter.com/doc/XSL/xeponline-fo-translate-beta.xsl"?>';
-        	xepOnline.Formatter.xep_chandra_service = 'http://xep.cloudformatter.com/Chandra.svc/genpackage';
-	        xepOnline.Formatter.xep_chandra_service_AS_PDF = 'http://xep.cloudformatter.com/Chandra.svc/genfile';
-	        xepOnline.Formatter.entity_declaration = '<!DOCTYPE div [  <!ENTITY % winansi SYSTEM "http://xep.cloudformatter.com/doc/XSL/winansi.xml">  %winansi;]>';
         function printSelected(){
             var selected = [];
             $('#report input:checked').each(function() {
@@ -1486,8 +1482,30 @@ function randomData(){
         chart.area(seriesData_3).color('#EEEE25').fill(fillFunction);
 
         chart.draw();
-    });
+
+        var clearLastDiv = function() {
+            var div = $('div').filter(':last');            
+            if($(div).find('g').children().length == 0) {
+                $(div).remove();
+            }
+            var svg = $('svg').filter(':last');
+            if($(svg).attr('width') == '0' && $(svg).attr('height') == '0') {
+                $(svg).remove();
+            }
+        }
+        setTimeout(clearLastDiv, 500);
+});
 
 </script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-46368000-3', 'auto');
+      ga('send', 'pageview');
+
+    </script>
     </body>
 </html>

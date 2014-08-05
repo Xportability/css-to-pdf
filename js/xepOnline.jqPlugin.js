@@ -103,6 +103,8 @@ xepOnline.Formatter = {
 	    var result = PrintCopy.replace(/(<img("[^"]*"|[^\/">])*)>/g, "$1/>");
 		result = result.replace(/(<br("[^"]*"|[^\/">])*)>/g, "$1/>");
 		result = result.replace(/(<input("[^"]*"|[^\/">])*)>/g, "$1/>");
+		result = result.replace(/(<embed("[^"]*"|[^\/">])*)>/g, "$1/>");
+		result = result.replace(/(<param("[^"]*"|[^\/">])*)>/g, "$1/>");
 		return result;
 
 		/*for(var i=0; i<xepOnline.Formatter.clean_tags.length; i++) {
@@ -121,6 +123,11 @@ xepOnline.Formatter = {
 	        xepOnline.Formatter.copyComputedStyle(elm2, elm2, parentStyle);
 	    });
 	},
+	getFormTextData: function(PrintCopy) {
+		var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
+		// TODO: consider escaping data rather than base64 data for earlier browsers, btoa support IE10+
+		return btoa(data);
+	},
 	getFormData: function(PrintCopy, Name, MimeType, FileName) {
 		var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
 	    var blob;
@@ -130,18 +137,18 @@ xepOnline.Formatter = {
 	    }
 	    catch(e) 
 	    {
-	    	if(e.name == 'TypeError') {
-	    		// TODO: get a blob for Safari   		
+	    	if(e.name === 'TypeError') {
+	    		throw new Error('Blob undefined')
 	    	}
 	    }
 
 	    if(blob === undefined) throw new Error('Blob undefined');
 
-	    var chandraObj = new FormData();
+	    var obj = new FormData();
 
-	    chandraObj.append(Name,blob,FileName);
-	    chandraObj.append('mimetype', MimeType);
-	    return chandraObj;
+	    obj.append(Name,blob,FileName);
+	    obj.append('mimetype', MimeType);
+	    return obj;
 	},
 	togglePrintMediaStyle: function() {
 		if($('head style[data-xeponline-formatting]').length > 0) {
@@ -225,11 +232,13 @@ xepOnline.Formatter = {
 		container.attr('style', stylebuilder);
 		container.attr('fostyle', fostylebuilder);
 
-    	var pathname = $(location).attr('pathname').substring(0, $(location).attr('pathname').lastIndexOf('/') + 1);
-    	var base = $(location).attr('protocol') + '//' + $(location).attr('hostname') + pathname;
-    	container.attr('base', base);
 
 		return container;
+	},
+	getBase: function() {
+	    var pathname = $(location).attr('pathname').substring(0, $(location).attr('pathname').lastIndexOf('/') + 1);
+    	var base = $(location).attr('protocol') + '//' + $(location).attr('hostname') + pathname;
+    	return base;
 	},
 	// IE Hack!
 	cleanSVGDeclarations: function(data) {
@@ -269,7 +278,7 @@ xepOnline.Formatter = {
 	xep_chandra_service: 'http://xep.cloudformatter.com/Chandra.svc/genpackage',
 	xep_chandra_service_AS_PDF: 'http://xep.cloudformatter.com/Chandra.svc/genfile',
 	entity_declaration:'<!DOCTYPE div [  <!ENTITY % winansi SYSTEM "http://xep.cloudformatter.com/doc/XSL/winansi.xml">  %winansi;]>',
-	xsl_stylesheet_declaration: '<?xml-stylesheet type="text/xsl" href="http://xep.cloudformatter.com/Doc/XSL/xeponline-fo-translate.xsl"?>',
+	xsl_stylesheet_declaration: '<?xml-stylesheet type="text/xsl" href="http://xep.cloudformatter.com/Doc/XSL/xeponline-fo-translate-2.xsl"?>',
 	src_type: { xml: 'text/xml'},
 	mime_type: { pdf: 'application/pdf'},
 	/* options	
@@ -291,58 +300,60 @@ xepOnline.Formatter = {
 					}			
 		}
 	*/
-	Format: function(ElementID, options) {
-		options.render = (options && options.render === undefined) ? options.render = 'newwin' : options.render;
+	__format: function(ElementIDs, options) {
+		options = options || {};
+		options.render = (options.render === undefined) ? 'newwin' : options.render;
+
 		if(xepOnline.IE() || xepOnline.mobilecheck()) {
 			options.render = 'download';
 		}
 
-		xepOnline.Formatter.__elm = $('#' + ElementID)[0];
-		xepOnline.Formatter.__clone = $(xepOnline.Formatter.__elm)[0].outerHTML;
-		xepOnline.Formatter.__container = xepOnline.Formatter.getFOContainer(options);
-
-		$('#' + ElementID).after($(xepOnline.Formatter.__container));
-		$(xepOnline.Formatter.__elm).appendTo($(xepOnline.Formatter.__container));			
-
-		xepOnline.Formatter.togglePrintMediaStyle();
-		xepOnline.Formatter.flattenStyle($(xepOnline.Formatter.__container)[0]);
-	
+         var printcopy = '';
+        $(ElementIDs).each(function(index, ElementID){
+           xepOnline.Formatter.__elm = $('#' + ElementID)[0];
+		   xepOnline.Formatter.__clone = $(xepOnline.Formatter.__elm)[0].outerHTML;
+		   xepOnline.Formatter.__container = xepOnline.Formatter.getFOContainer(options);
+		   $('#' + ElementID).after($(xepOnline.Formatter.__container));
+		   $(xepOnline.Formatter.__elm).appendTo($(xepOnline.Formatter.__container));			
+           xepOnline.Formatter.togglePrintMediaStyle();
+		   xepOnline.Formatter.flattenStyle($(xepOnline.Formatter.__container)[0]);
+		   printcopy = printcopy + xepOnline.Formatter.cleanTags($(xepOnline.Formatter.__container)[0].outerHTML);
+           xepOnline.Formatter.Clear();
+	    });
 
 	    if(options.render === 'none') {
 	    	return false;
 	    }
-
 	    if(options.render === 'embed') {
 	    	xepOnline.Formatter.__container.attr('data-xeponline-embed-pending', 'true');
 	    }
-
-	    var printcopy = xepOnline.Formatter.cleanTags($(xepOnline.Formatter.__container)[0].outerHTML);
-
 	    // fix IE double xmlns declerations in SVG
 	    if(xepOnline.IE()) {
 	    	printcopy = xepOnline.Formatter.cleanSVGDeclarations(printcopy);
 		}
-
-	    xepOnline.Formatter.Clear();
+	    //Kevin hack for now, stuff the whole thing in a document div
+	    printcopy = '<div base="' + xepOnline.Formatter.getBase() + '" class="xeponline-document">' + printcopy + '</div>';
 
 		var blob;
 		if(options.render !== 'download') {
-			var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + printcopy;
 			try 
 			{
 				blob = xepOnline.Formatter.getFormData(printcopy, 'xml', xepOnline.Formatter.mime_type.pdf, 'document.xml');
-			} catch(e) {}
-
-			// if blob not supported, force a download
-			if(blob === undefined) {
-				options.render = 'download';
-			}			
+			} catch(e) 
+			{
+				// switch render to download if blob undefined
+				if(e.message === 'Blob undefined') {
+					options.render = 'download';					
+				} else {
+					throw e;
+				}
+			}
 		}
 
 	    if(options.render === 'download') {
 			$('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'temp_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
 			$('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + xepOnline.Formatter.mime_type.pdf + '\'/>');
-			$('#temp_post').append('<textarea name=\'xml\'>' + btoa(data) + '</textarea>');
+			$('#temp_post').append('<textarea name=\'xml\'>' + xepOnline.Formatter.getFormTextData(printcopy) + '</textarea>');
 			$('#temp_post').submit();
 			$('#temp_post').remove();
 	    } else {
@@ -357,6 +368,13 @@ xepOnline.Formatter = {
 		    });
 	    }
 	    return false; 
+	},
+	FormatGroup: function(ElementIDs, options)
+	{
+		return xepOnline.Formatter.__format(ElementIDs, options);
+	},
+	Format: function(ElementID, options) {
+		return xepOnline.Formatter.__format([ElementID], options);
 	},
 	Clear: function() {
 		if($(xepOnline.Formatter.__container).length===0 || 
