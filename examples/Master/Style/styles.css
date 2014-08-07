@@ -32,7 +32,7 @@ h2{
     border-top:3px solid #111111;
     background-color:#eeeeee;
     font-size:30px;
-    padding:3px 10px;
+    padding:3px 10px 3px 0px;
 }
 .redcell{
     background-color:red;

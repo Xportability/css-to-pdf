@@ -60,6 +60,7 @@ xepOnline.Formatter = {
             'display', 'direction', 'dominantBaseline', 
             'fill', 'float', 
             'fontStyle', 'fontVariant', 'fontWeight', 'fontSize', 'fontFamily', 
+            'height',
             'listStyleType', 'listStyleImage', 'letterSpacing', 
             'marginTop', 'marginBottom', 'marginLeft', 'marginRight','orphans', 
             'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
@@ -126,10 +127,12 @@ xepOnline.Formatter = {
 	getFormTextData: function(PrintCopy) {
 		var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
 		// TODO: consider escaping data rather than base64 data for earlier browsers, btoa support IE10+
+		console.log(data);
 		return btoa(data);
 	},
 	getFormData: function(PrintCopy, Name, MimeType, FileName) {
 		var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
+	    console.log(data);
 	    var blob;
 	    try
 	    {
@@ -189,50 +192,42 @@ xepOnline.Formatter = {
 	getFOContainer: function(options) {
 		options = options || {};
 		var container = $('<div class=\'xeponline-container\'></div>');
+		var margincontainer = $('<div class=\'margin-container\'></div>');
+		container.append(margincontainer);
 		var stylebuilder = '';
+		var stylebuildermargin = '';
 		var fostylebuilder = '';
-
-		container.attr('page-width', options.pageWidth || xepOnline.DEFAULTS.pageWidth);
 		stylebuilder += 'width: ' + (options.pageWidth || xepOnline.DEFAULTS.pageWidth) + '; ';
-		container.attr('page-height', options.pageHeight || xepOnline.DEFAULTS.pageHeight);
-
+		stylebuilder += 'min-height: ' + (options.pageHeight || xepOnline.DEFAULTS.pageHeight) + '; ';
+		stylebuilder += 'max-height: ' + (options.pageHeight || xepOnline.DEFAULTS.pageHeight) + '; ';
 		if(options && options.pageMargin) {
-			container.attr('page-margin', options.pageMargin);
-			stylebuilder += 'margin: ' + options.pageMargin + '; ';
+			stylebuildermargin += 'margin: ' + options.pageMargin + '; ';
 		}
 		if(options && options.pageMarginTop) {
-			container.attr('page-margin-top', options.pageMarginTop);
-			stylebuilder += 'margin-top: ' + options.pageMarginTop + '; ';
+			stylebuildermargin += 'margin-top: ' + options.pageMarginTop + '; ';
 		}
 		if(options && options.pageMarginRight) {
-			container.attr('page-margin-right', options.pageMarginRight);
-			stylebuilder += 'margin-right: ' + options.pageMarginRight + '; ';
+			stylebuildermargin += 'margin-right: ' + options.pageMarginRight + '; ';
 		}
 		if(options && options.pageMarginBottom) {
-			container.attr('page-margin-bottom', options.pageMarginBottom);
-			stylebuilder += 'margin-bottom: ' + options.pageMarginBottom + '; ';
+			stylebuildermargin += 'margin-bottom: ' + options.pageMarginBottom + '; ';
 		}
 		if(options && options.pageMarginLeft) {
-			container.attr('page-margin-left', options.pageMarginLeft);
-			stylebuilder += 'margin-left: ' + options.pageMarginLeft + '; ';
+			stylebuildermargin += 'margin-left: ' + options.pageMarginLeft + '; ';
 		}
-
 		if(options && options.cssStyle) {
 			for(s in options.cssStyle) { 
 				stylebuilder += s.fromCamel() + ': ' + options.cssStyle[s] + '; ';				
 			}
 		}
-
 		if(options && options.foStyle) {
 			for(s in options.foStyle) { 
 				fostylebuilder += s.fromCamel() + ': ' + options.foStyle[s] + '; ';				
 			}
 		}
-
 		container.attr('style', stylebuilder);
+		margincontainer.attr('style', stylebuildermargin);
 		container.attr('fostyle', fostylebuilder);
-
-
 		return container;
 	},
 	getBase: function() {
@@ -314,7 +309,7 @@ xepOnline.Formatter = {
 		   xepOnline.Formatter.__clone = $(xepOnline.Formatter.__elm)[0].outerHTML;
 		   xepOnline.Formatter.__container = xepOnline.Formatter.getFOContainer(options);
 		   $('#' + ElementID).after($(xepOnline.Formatter.__container));
-		   $(xepOnline.Formatter.__elm).appendTo($(xepOnline.Formatter.__container));			
+		   $(xepOnline.Formatter.__elm).appendTo($(xepOnline.Formatter.__container).children(1));			
            xepOnline.Formatter.togglePrintMediaStyle();
 		   xepOnline.Formatter.flattenStyle($(xepOnline.Formatter.__container)[0]);
 		   printcopy = printcopy + xepOnline.Formatter.cleanTags($(xepOnline.Formatter.__container)[0].outerHTML);
