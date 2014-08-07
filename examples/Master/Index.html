@@ -8,14 +8,6 @@
         <script src="js/xepOnline.jqPlugin.005.js"></script>
         <!-- Set override xepOnline properties here -->
         <script>
-            xepOnline.Formatter.xsl_stylesheet_declaration = '<?xml-stylesheet type="text/xsl" href="http://localhost/XSL/xeponline-fo-translate-2.xsl"?>';
-        	xepOnline.Formatter.xep_chandra_service = 'http://localhost/RenderX.WebServices/Chandra.svc/genpackage';
-	        xepOnline.Formatter.xep_chandra_service_AS_PDF = 'http://localhost/RenderX.WebServices/Chandra.svc/genfile';
-	        xepOnline.Formatter.entity_declaration = '<!DOCTYPE div [  <!ENTITY % winansi SYSTEM "http://localhost/XSL/winansi.xml">  %winansi;]>';
-            //xepOnline.Formatter.xsl_stylesheet_declaration = '<?xml-stylesheet type="text/xsl" href="http://xep.cloudformatter.com/doc/XSL/xeponline-fo-translate.004.xsl"?>';
-        	//xepOnline.Formatter.xep_chandra_service = 'http://xep.cloudformatter.com/Chandra.svc/genpackage';
-	        //xepOnline.Formatter.xep_chandra_service_AS_PDF = 'http://xep.cloudformatter.com/Chandra.svc/genfile';
-	        //xepOnline.Formatter.entity_declaration = '<!DOCTYPE div [  <!ENTITY % winansi SYSTEM "http://xep.cloudformatter.com/doc/XSL/winansi.xml">  %winansi;]>';
         function printSelected(){
             var selected = [];
             $('#report input:checked').each(function() {
