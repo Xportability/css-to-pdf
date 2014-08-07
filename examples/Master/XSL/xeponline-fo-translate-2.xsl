@@ -1,6 +1,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:svg="http://www.w3.org/2000/svg"
-  xmlns:rx="http://www.renderx.com/XSL/Extensions" version="1.0">
+  xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+  xmlns:svg="http://www.w3.org/2000/svg"
+  xmlns:rx="http://www.renderx.com/XSL/Extensions"
+  version="1.0">
   <!-- Licensing Information
 This program is free software; you can redistribute it and/or modify it under the terms of the 
 GNU Affero General Public License version 3 as published by the Free Software Foundation with the 
@@ -13,14 +15,18 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General 
 Public License for more details from the following URL: http://www.gnu.org/licenses/agpl.html
     -->
-
-  <xsl:param name="pxtoin" select="1.25"/>
-  <xsl:param name="def-page-margin-top" select="'0.5in'"/>
-  <xsl:param name="def-page-margin-bottom" select="'0.5in'"/>
-  <xsl:param name="def-page-margin-left" select="'0.5in'"/>
-  <xsl:param name="def-page-margin-right" select="'0.5in'"/>
-
-
+  
+  <!-- This sets default margins here although they are set in Javascript
+       48px corresponds to 0.5in after the 1.25 factor to scale Web Browser
+       Pixels to RenderX pixels -->
+  <xsl:param name="def-page-page-width" select="'816px'"/>
+  <xsl:param name="def-page-page-height" select="'1056px'"/>
+  <xsl:param name="def-page-margin-top" select="'48px'"/>
+  <xsl:param name="def-page-margin-bottom" select="'48px'"/>
+  <xsl:param name="def-page-margin-left" select="'48px'"/>
+  <xsl:param name="def-page-margin-right" select="'48px'"/>
+  
+  
   <xsl:variable name="default.cb-select">✖</xsl:variable>
   <xsl:variable name="default.cb-noselect">&#x274f;</xsl:variable>
   <xsl:variable name="default.ob-select">✔</xsl:variable>
@@ -29,7 +35,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
 
   <!-- Document -->
   <xsl:template match="//div[@class='xeponline-document'][1]">
-    <fo:root font-family="Times New Roman" font-size="16px" id="xeponline-document">
+    <fo:root font-family="Times New Roman" font-size="14px" id="xeponline-document">
       <xsl:attribute name="xml:base">
         <xsl:value-of select="@base"/>
       </xsl:attribute>
@@ -42,26 +48,56 @@ Public License for more details from the following URL: http://www.gnu.org/licen
   <!-- Section Layout -->
   <xsl:template match="div[@class='xeponline-container']" mode="layout">
     <xsl:variable name="section" select="concat('section_',position())"/>
-    <xsl:variable name="margin-top">
-      <xsl:choose>
-        <xsl:when test="@page-margin-top">
-          <xsl:value-of select="@page-margin-top"/>
-        </xsl:when>
-        <xsl:when test="@page-margin">
-          <xsl:value-of select="@page-margin"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$def-page-margin-top"/>
-        </xsl:otherwise>
-      </xsl:choose>
+    <xsl:variable name="style-margin">
+      <xsl:call-template name="extractCSSStyle">
+        <xsl:with-param name="css" select="div[1]/@style"/>
+        <xsl:with-param name="style" select="'margin:'"/>
+      </xsl:call-template> 
     </xsl:variable>
+    <xsl:variable name="style-margin-top">
+      <xsl:call-template name="extractCSSStyle">
+        <xsl:with-param name="css" select="div[1]/@style"/>
+        <xsl:with-param name="style" select="'margin-top:'"/>
+      </xsl:call-template> 
+    </xsl:variable>
+    <xsl:variable name="style-margin-bottom">
+      <xsl:call-template name="extractCSSStyle">
+        <xsl:with-param name="css" select="div[1]/@style"/>
+        <xsl:with-param name="style" select="'margin-bottom:'"/>
+      </xsl:call-template> 
+    </xsl:variable>
+    <xsl:variable name="style-margin-left">
+      <xsl:call-template name="extractCSSStyle">
+        <xsl:with-param name="css" select="div[1]/@style"/>
+        <xsl:with-param name="style" select="'margin-left:'"/>
+      </xsl:call-template> 
+    </xsl:variable>
+    <xsl:variable name="style-margin-right">
+      <xsl:call-template name="extractCSSStyle">
+        <xsl:with-param name="css" select="div[1]/@style"/>
+        <xsl:with-param name="style" select="'margin-right:'"/>
+      </xsl:call-template> 
+    </xsl:variable>
+    <xsl:variable name="margin-top">
+        <xsl:choose>
+          <xsl:when test="string-length($style-margin-top) > 0">
+            <xsl:value-of select="$style-margin-top"/>
+          </xsl:when>
+          <xsl:when test="string-length($style-margin) > 0">
+            <xsl:value-of select="$style-margin"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$def-page-margin-top"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
     <xsl:variable name="margin-bottom">
       <xsl:choose>
-        <xsl:when test="@page-margin-bottom">
-          <xsl:value-of select="@page-margin-bottom"/>
+        <xsl:when test="string-length($style-margin-bottom) > 0">
+          <xsl:value-of select="$style-margin-bottom"/>
         </xsl:when>
-        <xsl:when test="@page-margin">
-          <xsl:value-of select="@page-margin"/>
+        <xsl:when test="string-length($style-margin) > 0">
+          <xsl:value-of select="$style-margin"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$def-page-margin-bottom"/>
@@ -70,11 +106,11 @@ Public License for more details from the following URL: http://www.gnu.org/licen
     </xsl:variable>
     <xsl:variable name="margin-left">
       <xsl:choose>
-        <xsl:when test="@page-margin-left">
-          <xsl:value-of select="@page-margin-left"/>
+        <xsl:when test="string-length($style-margin-left) > 0">
+          <xsl:value-of select="$style-margin-left"/>
         </xsl:when>
-        <xsl:when test="@page-margin">
-          <xsl:value-of select="@page-margin"/>
+        <xsl:when test="string-length($style-margin) > 0">
+          <xsl:value-of select="$style-margin"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$def-page-margin-left"/>
@@ -83,69 +119,88 @@ Public License for more details from the following URL: http://www.gnu.org/licen
     </xsl:variable>
     <xsl:variable name="margin-right">
       <xsl:choose>
-        <xsl:when test="@page-margin-right">
-          <xsl:value-of select="@page-margin-right"/>
+        <xsl:when test="string-length($style-margin-right) > 0">
+          <xsl:value-of select="$style-margin-right"/>
         </xsl:when>
-        <xsl:when test="@page-margin">
-          <xsl:value-of select="@page-margin"/>
+        <xsl:when test="string-length($style-margin) > 0">
+          <xsl:value-of select="$style-margin"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$def-page-margin-right"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <fo:simple-page-master>
-      <xsl:attribute name="master-name">
-        <xsl:value-of select="$section"/>
-      </xsl:attribute>
-      <xsl:attribute name="page-width">
-        <xsl:value-of select="@page-width"/>
-      </xsl:attribute>
-      <xsl:attribute name="page-height">
-        <xsl:value-of select="@page-height"/>
-      </xsl:attribute>
-      <xsl:attribute name="margin-left">
-        <xsl:value-of select="$margin-left"/>
-      </xsl:attribute>
-      <xsl:attribute name="margin-right">
-        <xsl:value-of select="$margin-right"/>
-      </xsl:attribute>
-      <fo:region-body>
-        <xsl:attribute name="margin-top">
-          <xsl:value-of select="$margin-top"/>
-        </xsl:attribute>
-        <xsl:attribute name="margin-bottom">
-          <xsl:value-of select="$margin-bottom"/>
-        </xsl:attribute>
-      </fo:region-body>
-      <fo:region-before>
-        <xsl:attribute name="extent">
-          <xsl:value-of select="@page-height"/>
-        </xsl:attribute>
-        <xsl:if test="descendant::header[1]/@page-background">
-          <xsl:attribute name="background-image">
-            <xsl:value-of select="descendant::header[1]/@page-background"/>
+        <fo:simple-page-master>
+          <xsl:attribute name="master-name">
+            <xsl:value-of select="$section"/>
           </xsl:attribute>
-        </xsl:if>
-      </fo:region-before>
-      <fo:region-after>
-        <xsl:attribute name="extent">
-          <xsl:value-of select="$margin-bottom"/>
-        </xsl:attribute>
-      </fo:region-after>
-    </fo:simple-page-master>
-  </xsl:template>
+          <xsl:variable name="page-width">
+            <xsl:call-template name="extractCSSStyle">
+              <xsl:with-param name="css" select="@style"/>
+              <xsl:with-param name="style" select="'width:'"/>
+            </xsl:call-template>  
+          </xsl:variable>
+          <xsl:attribute name="page-width">
+            <xsl:choose>
+              <xsl:when test="string-length($page-width) > 0">
+                <xsl:value-of select="$page-width"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$def-page-page-width"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+          <xsl:variable name="page-height">
+            <xsl:call-template name="extractCSSStyle">
+              <xsl:with-param name="css" select="@style"/>
+              <xsl:with-param name="style" select="'height:'"/>
+            </xsl:call-template>  
+          </xsl:variable>
+          <xsl:attribute name="page-height">
+            <xsl:choose>
+              <xsl:when test="string-length($page-height) > 0">
+                <xsl:value-of select="$page-height"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$def-page-page-height"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+          <xsl:attribute name="margin-left">
+            <xsl:value-of select="$margin-left"/>
+          </xsl:attribute>
+          <xsl:attribute name="margin-right">
+            <xsl:value-of select="$margin-right"/>
+          </xsl:attribute>
+          <fo:region-body>
+            <xsl:attribute name="margin-top">
+              <xsl:value-of select="$margin-top"/>
+            </xsl:attribute>
+            <xsl:attribute name="margin-bottom">
+              <xsl:value-of select="$margin-bottom"/>
+            </xsl:attribute>
+          </fo:region-body>
+          <fo:region-before>
+            <xsl:attribute name="extent">
+              <xsl:value-of select="$page-height"/>
+            </xsl:attribute>
+            <xsl:if test="descendant::header[1]/@page-background">
+              <xsl:attribute name="background-image">
+                <xsl:value-of select="descendant::header[1]/@page-background"/>
+              </xsl:attribute>
+            </xsl:if>
+          </fo:region-before>
+          <fo:region-after>
+            <xsl:attribute name="extent">
+              <xsl:value-of select="$margin-bottom"/>
+            </xsl:attribute>
+          </fo:region-after>
+        </fo:simple-page-master>
+  </xsl:template> 
   <!-- Section Content -->
   <xsl:template match="div[@class='xeponline-container']" mode="sequence">
     <xsl:variable name="section" select="concat('section_',position())"/>
     <fo:page-sequence master-reference="{$section}">
-      <xsl:if test="child::div/@pdfinsert">
-        <xsl:attribute name="rx:insert-document">
-          <xsl:text>url('</xsl:text>
-          <xsl:value-of select="child::div/@pdfinsert"/>
-          <xsl:text>')</xsl:text>
-        </xsl:attribute>
-      </xsl:if>
       <fo:static-content flow-name="xsl-region-before">
         <xsl:apply-templates select="descendant::header[1]" mode="regions"/>
       </fo:static-content>
@@ -159,17 +214,24 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         </fo:block>
       </fo:static-content>
       <fo:flow flow-name="xsl-region-body">
-        <xsl:apply-templates/>
+        <xsl:apply-templates select="child::div[1]/*"/>
       </fo:flow>
     </fo:page-sequence>
   </xsl:template>
   <!-- Header/Footer -->
   <xsl:template match="header | footer" mode="regions">
     <fo:block>
-      <xsl:call-template name="processAttr">
-        <xsl:with-param name="elem" select="."/>
-        <xsl:with-param name="type" select="name()"/>
-      </xsl:call-template>
+      <xsl:variable name="margin-top">
+        <xsl:call-template name="extractCSSStyle">
+          <xsl:with-param name="css" select="@style"/>
+          <xsl:with-param name="style" select="'margin-top:'"/>
+        </xsl:call-template>  
+      </xsl:variable>
+      <xsl:if test="string-length($margin-top) > 0">
+        <xsl:attribute name="margin-top">
+          <xsl:value-of select="$margin-top"/>
+        </xsl:attribute>
+      </xsl:if>
       <xsl:apply-templates select="node()"/>
     </fo:block>
   </xsl:template>
@@ -190,7 +252,9 @@ Public License for more details from the following URL: http://www.gnu.org/licen
               <xsl:with-param name="elem" select="."/>
               <xsl:with-param name="type" select="name()"/>
             </xsl:call-template>
-            <xsl:apply-templates select="node()"/>
+            <fo:block>
+              <xsl:apply-templates select="node()"/>  
+            </fo:block>
           </fo:block>
         </xsl:when>
         <xsl:otherwise>
@@ -230,24 +294,6 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         <xsl:apply-templates select="node()"/>
       </fo:block>
     </xsl:if>
-  </xsl:template>
-  <xsl:template match="object">
-    <fo:block>
-      <rx:media-object embed="false" extraction-policy="tempalways" show-controls="true">
-        <xsl:attribute name="content-height">
-          <xsl:value-of select="concat(embed/@height,'px')"/>
-        </xsl:attribute>
-        <xsl:attribute name="content-width">
-          <xsl:value-of select="concat(embed/@width,'px')"/>
-        </xsl:attribute>
-        <xsl:attribute name="content-type">
-          <xsl:value-of select="embed/@type"/>
-        </xsl:attribute>
-        <xsl:attribute name="src">
-          <xsl:value-of select="embed/@src"/>
-        </xsl:attribute>
-      </rx:media-object>
-    </fo:block>
   </xsl:template>
   <!--Inlines -->
   <xsl:template
@@ -358,10 +404,6 @@ Public License for more details from the following URL: http://www.gnu.org/licen
           <xsl:with-param name="elem" select="."/>
           <xsl:with-param name="type" select="name()"/>
         </xsl:call-template>
-        <!-- Hack override all tables to 100% -->
-        <xsl:attribute name="width">
-          <xsl:text>100%</xsl:text>
-        </xsl:attribute>
         <xsl:apply-templates select="node()"/>
       </fo:table>
     </xsl:if>
@@ -635,7 +677,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         </fo:list-item-body>
       </fo:list-item>
     </xsl:if>
-  </xsl:template>
+  </xsl:template>  
   <!-- Form Elements -->
   <xsl:template match="form">
     <fo:block>
@@ -643,32 +685,32 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         <xsl:with-param name="elem" select="."/>
         <xsl:with-param name="type" select="name()"/>
       </xsl:call-template>
-      <xsl:apply-templates/>
+      <xsl:apply-templates/>  
     </fo:block>
   </xsl:template>
   <xsl:template match="input[@type='text']">
-    <fo:inline>
-      <xsl:call-template name="processAttr">
-        <xsl:with-param name="elem" select="."/>
-        <xsl:with-param name="type" select="name()"/>
-      </xsl:call-template>
-      <rx:pdf-form-field>
-        <xsl:call-template name="form_field_attributes"/>
-        <xsl:element name="rx:pdf-form-field-text">
-          <xsl:attribute name="text">
-            <xsl:value-of select="."/>
-          </xsl:attribute>
-        </xsl:element>
-      </rx:pdf-form-field>
-      <fo:leader>
-        <xsl:attribute name="leader-length">
-          <xsl:call-template name="extractCSSStyle">
-            <xsl:with-param name="css" select="@style"/>
-            <xsl:with-param name="style" select="'width:'"/>
+        <fo:inline>
+          <xsl:call-template name="processAttr">
+            <xsl:with-param name="elem" select="."/>
+            <xsl:with-param name="type" select="name()"/>
           </xsl:call-template>
-        </xsl:attribute>
-      </fo:leader>
-    </fo:inline>
+          <rx:pdf-form-field>
+            <xsl:call-template name="form_field_attributes"/>
+            <xsl:element name="rx:pdf-form-field-text">
+              <xsl:attribute name="text">
+                <xsl:value-of select="."/>
+              </xsl:attribute>
+            </xsl:element>
+          </rx:pdf-form-field>
+                <fo:leader>
+                  <xsl:attribute name="leader-length">
+                    <xsl:call-template name="extractCSSStyle">
+                      <xsl:with-param name="css" select="@style"/>
+                      <xsl:with-param name="style" select="'width:'"></xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:attribute>
+                </fo:leader>
+        </fo:inline>
   </xsl:template>
   <xsl:template match="textarea">
     <!-- A text area cannot be in an inline, it must be in a constrained area so we use a block-container -->
@@ -689,14 +731,14 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         </xsl:element>
       </rx:pdf-form-field>
       <fo:block>
-        <fo:leader>
-          <xsl:attribute name="leader-length">
-            <xsl:call-template name="extractCSSStyle">
-              <xsl:with-param name="css" select="@style"/>
-              <xsl:with-param name="style" select="'width:'"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </fo:leader>
+      <fo:leader>
+        <xsl:attribute name="leader-length">
+          <xsl:call-template name="extractCSSStyle">
+            <xsl:with-param name="css" select="@style"/>
+            <xsl:with-param name="style" select="'width:'"></xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </fo:leader>
       </fo:block>
     </fo:block-container>
   </xsl:template>
@@ -705,58 +747,59 @@ Public License for more details from the following URL: http://www.gnu.org/licen
       <xsl:call-template name="isVisible"/>
     </xsl:variable>
     <xsl:if test="$isVisible = 'true'">
+    <fo:inline>
+      <xsl:attribute name="border-width">1pt</xsl:attribute>
+      <xsl:attribute name="border-style">solid</xsl:attribute>
+      <xsl:attribute name="border-color">silver</xsl:attribute>
+      <xsl:attribute name="background-color">lavender</xsl:attribute>
+      <xsl:attribute name="font-family">ZapfDingbats</xsl:attribute>
+      <xsl:attribute name="font-size">14px</xsl:attribute>
       <fo:inline>
-        <xsl:attribute name="border-width">1pt</xsl:attribute>
-        <xsl:attribute name="border-style">solid</xsl:attribute>
-        <xsl:attribute name="border-color">silver</xsl:attribute>
-        <xsl:attribute name="background-color">lavender</xsl:attribute>
-        <xsl:attribute name="font-family">ZapfDingbats</xsl:attribute>
-        <xsl:attribute name="font-size">14px</xsl:attribute>
-        <fo:inline>
-          <xsl:element name="rx:pdf-form-field">
-            <xsl:call-template name="form_field_attributes"/>
-            <xsl:element name="rx:pdf-form-field-checkbox">
-              <rx:pdf-form-field-option text="{$default.cb-select}"/>
-              <rx:pdf-form-field-option text="&#x21;"/>
+            <xsl:element name="rx:pdf-form-field">
+              <xsl:call-template name="form_field_attributes"/>
+              <xsl:element name="rx:pdf-form-field-checkbox">
+                <rx:pdf-form-field-option text="{$default.cb-select}"/>
+                <rx:pdf-form-field-option text="&#x21;"/>
+              </xsl:element>
             </xsl:element>
-          </xsl:element>
-          <fo:leader leader-length="12px"/>
-        </fo:inline>
-      </fo:inline>
+            <fo:leader leader-length="12px"/>
+          </fo:inline>
+    </fo:inline>
     </xsl:if>
   </xsl:template>
-  <xsl:template match="select">
-    <fo:inline>
-      <xsl:call-template name="processAttr">
-        <xsl:with-param name="elem" select="."/>
-        <xsl:with-param name="type" select="name()"/>
-      </xsl:call-template>
-      <rx:pdf-form-field>
-        <xsl:call-template name="form_field_attributes"/>
-        <xsl:element name="rx:pdf-form-field-combobox">
-          <xsl:for-each select="option">
-            <rx:pdf-form-field-option>
-              <xsl:attribute name="text">
-                <xsl:value-of select="."/>
+  <xsl:template match="select"> 
+        <fo:inline>
+          <xsl:call-template name="processAttr">
+            <xsl:with-param name="elem" select="."/>
+            <xsl:with-param name="type" select="name()"/>
+          </xsl:call-template>
+          <rx:pdf-form-field>
+            <xsl:call-template name="form_field_attributes"/>
+            <xsl:element name="rx:pdf-form-field-combobox">
+              <xsl:for-each select="option">
+                <rx:pdf-form-field-option>
+                  <xsl:attribute name="text">
+                    <xsl:value-of select="."/>
+                  </xsl:attribute>
+                  <xsl:if test="@selected">
+                    <xsl:attribute name="initially-selected"
+                      >true</xsl:attribute>
+                  </xsl:if>
+                </rx:pdf-form-field-option>
+              </xsl:for-each>
+            </xsl:element>
+          </rx:pdf-form-field>
+          <fo:inline>
+            <fo:leader>
+              <xsl:attribute name="leader-length">
+                <xsl:call-template name="extractCSSStyle">
+                  <xsl:with-param name="css" select="@style"/>
+                  <xsl:with-param name="style" select="'width:'"></xsl:with-param>
+                </xsl:call-template>
               </xsl:attribute>
-              <xsl:if test="@selected">
-                <xsl:attribute name="initially-selected">true</xsl:attribute>
-              </xsl:if>
-            </rx:pdf-form-field-option>
-          </xsl:for-each>
-        </xsl:element>
-      </rx:pdf-form-field>
-      <fo:inline>
-        <fo:leader>
-          <xsl:attribute name="leader-length">
-            <xsl:call-template name="extractCSSStyle">
-              <xsl:with-param name="css" select="@style"/>
-              <xsl:with-param name="style" select="'width:'"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </fo:leader>
-      </fo:inline>
-    </fo:inline>
+            </fo:leader>
+          </fo:inline>
+        </fo:inline>
   </xsl:template>
   <!-- Common Field-level Javascript Attributes -->
   <xsl:template name="calculate">
@@ -850,7 +893,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         <xsl:with-param name="elem" select="."/>
         <xsl:with-param name="type" select="name()"/>
       </xsl:call-template>
-      <fo:page-number/>
+      <fo:page-number/>  
     </fo:inline>
   </xsl:template>
   <xsl:template match="totpages">
@@ -859,7 +902,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         <xsl:with-param name="elem" select="."/>
         <xsl:with-param name="type" select="name()"/>
       </xsl:call-template>
-      <fo:page-number-citation-last ref-id="xeponline-document"/>
+      <fo:page-number-citation-last ref-id="xeponline-document"/>  
     </fo:inline>
   </xsl:template>
   <!-- Utility Templates -->
@@ -938,11 +981,21 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         </xsl:if>
       </xsl:when>
       <xsl:when test="$attr = 'width'">
-        <xsl:if test="$type = 'img'">
-          <xsl:attribute name="content-width">
-            <xsl:value-of select="$value"/>
-          </xsl:attribute>
-        </xsl:if>
+        <xsl:choose>
+          <xsl:when test="$type = 'img'">
+            <xsl:attribute name="content-width">
+              <xsl:value-of select="$value"/>
+            </xsl:attribute>  
+          </xsl:when>
+          <xsl:when test="$value = '0px'">
+            <!-- do nothing, comes through on hidden divs when we want the content -->
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="width">
+              <xsl:value-of select="$value"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:when test="$attr = 'height'">
         <xsl:choose>
@@ -951,11 +1004,14 @@ Public License for more details from the following URL: http://www.gnu.org/licen
               <xsl:value-of select="$value"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test="$type = 'textarea'">
+          <xsl:when test="$value = '0px'">
+            <!-- do nothing, comes through on hidden divs when we want the content -->
+          </xsl:when>
+          <xsl:otherwise>
             <xsl:attribute name="height">
               <xsl:value-of select="$value"/>
             </xsl:attribute>
-          </xsl:when>
+          </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <xsl:when test="$attr = 'vertical-align'">
@@ -998,10 +1054,6 @@ Public License for more details from the following URL: http://www.gnu.org/licen
             <xsl:when test="$type = 'inline'">
               <xsl:value-of select="$value"/>
             </xsl:when>
-            <xsl:when test="$type='master'">
-              <xsl:variable name="newval" select="number(translate($value,'px','')) * $pxtoin"/>
-              <xsl:value-of select="concat($newval,'px')"/>
-            </xsl:when>
             <xsl:otherwise>
               <xsl:variable name="newval" select="number(translate($value,'px','')) div 2"/>
               <xsl:value-of select="concat($newval,'px')"/>
@@ -1016,10 +1068,6 @@ Public License for more details from the following URL: http://www.gnu.org/licen
             <xsl:when test="$type = 'inline'">
               <xsl:value-of select="$value"/>
             </xsl:when>
-            <xsl:when test="$type='master'">
-              <xsl:variable name="newval" select="number(translate($value,'px','')) * $pxtoin"/>
-              <xsl:value-of select="concat($newval,'px')"/>
-            </xsl:when>
             <xsl:otherwise>
               <xsl:variable name="newval" select="number(translate($value,'px','')) div 2"/>
               <xsl:value-of select="concat($newval,'px')"/>
@@ -1029,28 +1077,12 @@ Public License for more details from the following URL: http://www.gnu.org/licen
       </xsl:when>
       <xsl:when test="$attr = 'margin-left'">
         <xsl:attribute name="margin-left">
-          <xsl:choose>
-            <xsl:when test="$type='master'">
-              <xsl:variable name="newval" select="number(translate($value,'px','')) * $pxtoin"/>
-              <xsl:value-of select="concat($newval,'px')"/>
-            </xsl:when>
-            <xsl:otherwise>
               <xsl:value-of select="$value"/>
-            </xsl:otherwise>
-          </xsl:choose>
         </xsl:attribute>
       </xsl:when>
       <xsl:when test="$attr = 'margin-right'">
         <xsl:attribute name="margin-right">
-          <xsl:choose>
-            <xsl:when test="$type='master'">
-              <xsl:variable name="newval" select="number(translate($value,'px','')) * $pxtoin"/>
-              <xsl:value-of select="concat($newval,'px')"/>
-            </xsl:when>
-            <xsl:otherwise>
               <xsl:value-of select="$value"/>
-            </xsl:otherwise>
-          </xsl:choose>
         </xsl:attribute>
       </xsl:when>
       <xsl:when test="$attr = 'background-image'">
@@ -1076,7 +1108,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         <xsl:attribute name="background-repeat">
           <xsl:choose>
             <xsl:when test="string-length(substring-before($value,' ')) > 0">
-              <xsl:value-of select="substring-before($value,' ')"/>
+              <xsl:value-of select="substring-before($value,' ')"/>    
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$value"/>
@@ -1119,13 +1151,11 @@ Public License for more details from the following URL: http://www.gnu.org/licen
       You cannot just preface a blank before the search, aka " width:" because it it starts with style="width: it would not match 
       -->
     <xsl:choose>
-      <xsl:when
-        test="string-length(normalize-space(substring-before(substring-after($css,concat(' ',$style)),';'))) > 0">
-        <xsl:value-of
-          select="normalize-space(substring-before(substring-after($css,concat(' ',$style)),';'))"/>
+      <xsl:when test="string-length(normalize-space(substring-before(substring-after($css,concat(' ',$style)),';'))) > 0">
+        <xsl:value-of select="normalize-space(substring-before(substring-after($css,concat(' ',$style)),';'))"/>
       </xsl:when>
       <xsl:when test="starts-with($css,$style)">
-        <xsl:value-of select="normalize-space(substring-before(substring-after($css,$style),';'))"/>
+        <xsl:value-of select="normalize-space(substring-before(substring-after($css,$style),';'))"/>    
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -1163,7 +1193,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
   </xsl:template>
   <!-- Eliminate certain elements and attributes, they are either handled or need to be ignored -->
   <xsl:template
-    match="header | footer | iframe | script | noscript | embed | param | map | area | canvas | audio | video | track | source | nav"/>
+    match="header | footer | iframe | script | noscript | embed | object | param | map | area | canvas | audio | video | track | source | nav"/>
   <xsl:template
     match="@page-background | @name | @type | @cellspacing | @align | @cursor | @border | @class | @alt | @base | @display | @onclick | @target | @float | @page-width | @page-height | @page-margin-right | @page-margin-left | @page-margin-top | @page-margin-bottom | @style[not(ancestor::svg:svg)] | @fostyle"/>
   <!-- Unknown element match for generic XML -->
@@ -1181,10 +1211,6 @@ Public License for more details from the following URL: http://www.gnu.org/licen
             <xsl:with-param name="elem" select="."/>
             <xsl:with-param name="type" select="name()"/>
           </xsl:call-template>
-          <!-- Hack overide all tables to 100% -->
-          <xsl:attribute name="width">
-            <xsl:text>100%</xsl:text>
-          </xsl:attribute>
           <xsl:apply-templates/>
         </fo:table>
       </xsl:when>
