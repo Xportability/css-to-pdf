@@ -195,9 +195,9 @@ xepOnline.Formatter = {
 		var stylebuilder = '';
 		var stylebuildermargin = '';
 		var fostylebuilder = '';
-		container.attr('page-width', options.pageWidth || xepOnline.DEFAULTS.pageWidth);
 		stylebuilder += 'width: ' + (options.pageWidth || xepOnline.DEFAULTS.pageWidth) + '; ';
-		container.attr('page-height', options.pageHeight || xepOnline.DEFAULTS.pageHeight);
+		stylebuilder += 'min-height: ' + (options.pageHeight || xepOnline.DEFAULTS.pageHeight) + '; ';
+		stylebuilder += 'max-height: ' + (options.pageHeight || xepOnline.DEFAULTS.pageHeight) + '; ';
 		if(options && options.pageMargin) {
 			stylebuildermargin += 'margin: ' + options.pageMargin + '; ';
 		}
