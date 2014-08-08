@@ -203,8 +203,7 @@ xepOnline.Formatter = {
 		var fostylebuilder = '';
 		
 		stylebuilder += 'width: ' 			+ options.pageWidth + '; ';
-		stylebuilder += 'min-height: ' 		+ options.pageHeight + '; ';
-		stylebuilder += 'max-height: ' 		+ options.pageHeight + '; ';
+		stylebuilder += 'height: ' 			+ options.pageHeight + '; ';
 		stylebuildermargin += 'margin: ' 	+ options.pageMargin + '; ';
 
 		if(options && options.pageMarginTop) {
