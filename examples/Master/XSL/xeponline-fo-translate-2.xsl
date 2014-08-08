@@ -987,6 +987,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
               <xsl:value-of select="$value"/>
             </xsl:attribute>  
           </xsl:when>
+         
           <xsl:when test="$value = '0px'">
             <!-- do nothing, comes through on hidden divs when we want the content -->
           </xsl:when>
@@ -1003,6 +1004,10 @@ Public License for more details from the following URL: http://www.gnu.org/licen
             <xsl:attribute name="content-height">
               <xsl:value-of select="$value"/>
             </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="$type = 'tr' or $type = 'td' or $type = 'th' or $type='thead' or $type = 'tfoot' or $type = 'tbody'">
+            <!-- do nothing, let formatter do its job, some browsers report wrong height -->
+            <!-- This is in place now for only IE -->
           </xsl:when>
           <xsl:when test="$value = '0px'">
             <!-- do nothing, comes through on hidden divs when we want the content -->
@@ -1209,7 +1214,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         <fo:table>
           <xsl:call-template name="processAttr">
             <xsl:with-param name="elem" select="."/>
-            <xsl:with-param name="type" select="name()"/>
+            <xsl:with-param name="type" select="'table'"/>
           </xsl:call-template>
           <xsl:apply-templates/>
         </fo:table>
@@ -1218,7 +1223,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         <fo:table-body>
           <xsl:call-template name="processAttr">
             <xsl:with-param name="elem" select="."/>
-            <xsl:with-param name="type" select="name()"/>
+            <xsl:with-param name="type" select="'tbody'"/>
           </xsl:call-template>
           <xsl:apply-templates/>
         </fo:table-body>
@@ -1228,7 +1233,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
           <fo:table-row>
             <xsl:call-template name="processAttr">
               <xsl:with-param name="elem" select="."/>
-              <xsl:with-param name="type" select="name()"/>
+              <xsl:with-param name="type" select="'thead'"/>
             </xsl:call-template>
             <xsl:apply-templates/>
           </fo:table-row>
@@ -1238,7 +1243,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         <fo:table-row>
           <xsl:call-template name="processAttr">
             <xsl:with-param name="elem" select="."/>
-            <xsl:with-param name="type" select="name()"/>
+            <xsl:with-param name="type" select="'tr'"/>
           </xsl:call-template>
           <xsl:apply-templates/>
         </fo:table-row>
@@ -1247,7 +1252,7 @@ Public License for more details from the following URL: http://www.gnu.org/licen
         <fo:table-cell>
           <xsl:call-template name="processAttr">
             <xsl:with-param name="elem" select="."/>
-            <xsl:with-param name="type" select="name()"/>
+            <xsl:with-param name="type" select="'td'"/>
           </xsl:call-template>
           <fo:block>
             <xsl:apply-templates/>
