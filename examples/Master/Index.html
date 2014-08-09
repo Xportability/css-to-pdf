@@ -8,7 +8,7 @@
         <script src="js/xepOnline.jqPlugin.008.js"></script>
         <!-- Set override xepOnline properties here -->
         <script>
-        function printSelected(){
+            function printSelected(){
             var selected = [];
             $('#report input:checked').each(function() {
                 selected.push($(this).attr('name'));
@@ -1371,57 +1371,164 @@ we support the "pre" element.</pre>
                             <ProdGrp>CD</ProdGrp>
                             <RspFlg>0</RspFlg>
                         </AcctSum>
-                        <AcctSum>
-                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
-                            <AcctNum>3505014308</AcctNum>
-                            <Bal>$7,060.41</Bal>
-                            <NName></NName>
-                            <PlId></PlId>
-                            <ProdGrp>CD</ProdGrp>
-                            <RspFlg>0</RspFlg>
-                        </AcctSum>
-                        <AcctSum class="alt">
-                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
-                            <AcctNum>3505025032</AcctNum>
-                            <Bal>$3,500.00</Bal>
-                            <NName></NName>
-                            <PlId></PlId>
-                            <ProdGrp>CD</ProdGrp>
-                            <RspFlg>0</RspFlg>
-                        </AcctSum>
-                        <AcctSum>
-                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
-                            <AcctNum>3505025070</AcctNum>
-                            <Bal>$1,500.00</Bal>
-                            <NName></NName>
-                            <PlId></PlId>
-                            <ProdGrp>CD</ProdGrp>
-                            <RspFlg>0</RspFlg>
-                        </AcctSum>
-                        <AcctSum class="alt">
-                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
-                            <AcctNum>3505043641</AcctNum>
-                            <Bal>$4,069.04</Bal>
-                            <NName></NName>
-                            <PlId></PlId>
-                            <ProdGrp>CD</ProdGrp>
-                            <RspFlg>0</RspFlg>
-                        </AcctSum>
-                        <AcctSum>
-                            <ProdDes> Guaranteed Investment (GIC) </ProdDes>
-                            <AcctNum>3505363000</AcctNum>
-                            <Bal>$8,000.00</Bal>
-                            <NName></NName>
-                            <PlId></PlId>
-                            <ProdGrp>CD</ProdGrp>
-                            <RspFlg>0</RspFlg>
-                        </AcctSum>
                     </TableRows>
                 </StmtSum>
                 <p>And this table is formatted according to the css styling, even carried through to
                     the PDF. You so not have to change XML tags, you only indicate their style as
                     "table" or "table-row" or "block" or "inline" in the css and XEPOnline will
                     format the generic XML according to the css styling to print.</p>
+                <h3>"Continued" Style Table Headers</h3>
+                <p>You can implement continued-headers using the "fostyle" attribute. You want to 
+                mark the actual header with a special property that omits it from the output, then 
+                use the first row to implement the header you want at the start of the table.</p>
+                <p>For the correct appearance to be in the HTML, you want to not display the &lt;thead&gt; 
+                element, using @print media commands to set it to display only on print.</p>
+                <table id="customers" fostyle="table-omit-initial-header:true;">
+                    <thead class="print">
+                        <tr>
+                            <th>Company (continued)</th>
+                            <th>Contact (continued)</th>
+                            <th>Country (continued)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Company Header</th>
+                            <th>Contact Header</th>
+                            <th>Country Header</th>
+                        </tr>
+                        <tr>
+                            <td>Alfreds Futterkiste</td>
+                            <td>Maria Anders</td>
+                            <td>Germany</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Berglunds snabbköp</td>
+                            <td>Christina Berglund</td>
+                            <td>Sweden</td>
+                        </tr>
+                        <tr>
+                            <td>Centro comercial Moctezuma</td>
+                            <td>Francisco Chang</td>
+                            <td>Mexico</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Ernst Handel</td>
+                            <td>Roland Mendel</td>
+                            <td>Austria</td>
+                        </tr>
+                        <tr>
+                            <td>Island Trading</td>
+                            <td>Helen Bennett</td>
+                            <td>UK</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Königlich Essen</td>
+                            <td>Philip Cramer</td>
+                            <td>Germany</td>
+                        </tr>
+                        <tr>
+                            <td>Laughing Bacchus Winecellars</td>
+                            <td>Yoshi Tannamuri</td>
+                            <td>Canada</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Magazzini Alimentari Riuniti</td>
+                            <td>Giovanni Rovelli</td>
+                            <td>Italy</td>
+                        </tr>
+                        <tr>
+                            <td>North/South</td>
+                            <td>Simon Crowther</td>
+                            <td>UK</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Paris spécialités</td>
+                            <td>Marie Bertrand</td>
+                            <td>France</td>
+                        </tr>
+                        <tr>
+                            <td>Alfreds Futterkiste</td>
+                            <td>Maria Anders</td>
+                            <td>Germany</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Berglunds snabbköp</td>
+                            <td>Christina Berglund</td>
+                            <td>Sweden</td>
+                        </tr>
+                        <tr>
+                            <td>Centro comercial Moctezuma</td>
+                            <td>Francisco Chang</td>
+                            <td>Mexico</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Ernst Handel</td>
+                            <td>Roland Mendel</td>
+                            <td>Austria</td>
+                        </tr>
+                        <tr>
+                            <td>Island Trading</td>
+                            <td>Helen Bennett</td>
+                            <td>UK</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Königlich Essen</td>
+                            <td>Philip Cramer</td>
+                            <td>Germany</td>
+                        </tr>
+                        <tr>
+                            <td>Laughing Bacchus Winecellars</td>
+                            <td>Yoshi Tannamuri</td>
+                            <td>Canada</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Magazzini Alimentari Riuniti</td>
+                            <td>Giovanni Rovelli</td>
+                            <td>Italy</td>
+                        </tr>
+                        <tr>
+                            <td>Alfreds Futterkiste</td>
+                            <td>Maria Anders</td>
+                            <td>Germany</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Berglunds snabbköp</td>
+                            <td>Christina Berglund</td>
+                            <td>Sweden</td>
+                        </tr>
+                        <tr>
+                            <td>Centro comercial Moctezuma</td>
+                            <td>Francisco Chang</td>
+                            <td>Mexico</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Ernst Handel</td>
+                            <td>Roland Mendel</td>
+                            <td>Austria</td>
+                        </tr>
+                        <tr>
+                            <td>Island Trading</td>
+                            <td>Helen Bennett</td>
+                            <td>UK</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Königlich Essen</td>
+                            <td>Philip Cramer</td>
+                            <td>Germany</td>
+                        </tr>
+                        <tr>
+                            <td>Laughing Bacchus Winecellars</td>
+                            <td>Yoshi Tannamuri</td>
+                            <td>Canada</td>
+                        </tr>
+                        <tr class="alt">
+                            <td>Magazzini Alimentari Riuniti</td>
+                            <td>Giovanni Rovelli</td>
+                            <td>Italy</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div id="development">
                 

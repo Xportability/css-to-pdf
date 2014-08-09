@@ -1,6 +1,10 @@
 .noprint {
 	display:none;
 }
+.print {
+    width:100%;
+    display:table-header-group;
+}
 #customers.black-white th {
     background-color:#FFF;
     color:#000;

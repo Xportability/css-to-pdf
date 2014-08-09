@@ -187,3 +187,7 @@ a.nodec {
 .foot{
     text-align:center;
 }
+.print{
+    width:100%;
+    display:none;
+}

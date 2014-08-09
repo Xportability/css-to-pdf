@@ -1134,6 +1134,11 @@ Public License for more details from the following URL: http://www.gnu.org/licen
           </xsl:choose>
         </xsl:attribute>
       </xsl:when>
+      <xsl:when test="$attr = 'table-omit-initial-header'">
+        <xsl:attribute name="rx:table-omit-initial-header">
+          <xsl:value-of select="$value"/>
+        </xsl:attribute>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name="{$attr}">
           <xsl:value-of select="$value"/>
