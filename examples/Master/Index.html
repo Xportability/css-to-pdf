@@ -5,7 +5,7 @@
         <script src="js/anychart.min.js"></script>
         <script src="js/d3.min.js"></script>
         <script src="js/d3-donut.js"></script>
-        <script src="js/xepOnline.jqPlugin.007.js"></script>
+        <script src="js/xepOnline.jqPlugin.008.js"></script>
         <!-- Set override xepOnline properties here -->
         <script>
         function printSelected(){
@@ -205,7 +205,67 @@ we support the "pre" element.</pre>
                     boxes like this are used to convey information to you. In fact, this is a great
                     example showing mapping css styles to formatting. It includes using border,
                     colors, fonts and background-images all with css styles.</div>
-                <h2 id="Inline_Elements">Inline Elements</h2>
+                <p>To apply absolute sizes (width or height), you need to use floats. The following set of examples 
+                show float styles applied to &lt;div&gt; elements.</p>
+                <div style="float:left;clear:both;display:block;width:1in;height:1in;background-color:#cccccc;">
+                    1in x 1in
+                </div>
+                <div style="float:left;clear:both;display:block;width:2in;height:0.5in;background-color:#dddddd;">
+                    0.5in x 2in
+                </div>
+                <div style="float:left;clear:both;display:block;width:3in;height:1in;background-color:#cccccc;">
+                    1in x 3in
+                </div>
+                <div style="float:left;clear:both;display:block;width:4in;height:0.5in;background-color:#dddddd;">
+                    0.5in x 4in
+                </div>
+                <p style="clear:left;">Even stackable floats</p>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#ee0000;">
+                    1
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#00ee00;">
+                    2
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#0000ee;">
+                    3
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#ee0000;">
+                    4
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#00ee00;">
+                    5
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#0000ee;">
+                    6
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#ee0000;">
+                    7
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#00ee00;">
+                    8
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#0000ee;">
+                    9
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#ee0000;">
+                    10
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#ee0000;">
+                    11
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#00ee00;">
+                    12
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#0000ee;">
+                    13
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#ee0000;">
+                    14
+                </div>
+                <div style="border:solid 2px #c0c0c0;color:white;font-size:32px;font-weight:bold;text-align:center;float:left;display:block;width:1in;height:1in;background-color:#00ee00;">
+                    15
+                </div>
+                <h2 id="Inline_Elements" style="clear:left;">Inline Elements</h2>
                 <p>Testing some <i>inline</i> elements. There are some elements still used like
                         <b>"b" for bold</b> and <i>"i" for italic</i>. They can even be combined
                     like <b><i><u>bold italic underline</u></i></b>. The more modern approach of
@@ -1068,8 +1128,8 @@ we support the "pre" element.</pre>
                 <p>Now, a slightly more complex design that one would expect from a javascript
                     solution like Twitter Bootstrap would appear like this. We are directly writing
                     the styles and not using Twitter Bootstrap for testing purposes.</p>
-                <div style="display: block; margin-left:-15px;">
-                    <div style="float:left; margin: 0px 15px; width: 31%; ">
+                <div style="display: block;">
+                    <div style="float:left; margin: 0px 15px 0px 0px; width: 30%; ">
                         <h3>Heading for Column 1</h3>
                         <p>This is a bunch of text in the column. This is a bunch of text in the
                             column. This is a bunch of text in the column. This is a bunch of text
@@ -1079,7 +1139,7 @@ we support the "pre" element.</pre>
                             is a bunch of text in the column. This is a bunch of text in the column.
                         </p>
                     </div>
-                    <div style="float:left; margin: 0px 15px; width: 31%; ">
+                    <div style="float:left; margin: 0px 15px 0px 0px; width: 30%; ">
                         <h3>Heading for Column 2</h3>
                         <p>This is a bunch of text in the column. This is a bunch of text in the
                             column. This is a bunch of text in the column. This is a bunch of text
@@ -1089,7 +1149,7 @@ we support the "pre" element.</pre>
                             is a bunch of text in the column. This is a bunch of text in the column.
                         </p>
                     </div>
-                    <div style="float:left; margin: 0px 15px; width: 31%; ">
+                    <div style="float:left; margin: 0px; width: 30%; ">
                         <h3>Heading for Column 3</h3>
                         <p>This is a bunch of text in the column. This is a bunch of text in the
                             column. This is a bunch of text in the column. This is a bunch of text
@@ -1101,7 +1161,7 @@ we support the "pre" element.</pre>
                     </div>
                 </div>
             </div>
-            <div style="clear: both; page-break-before: always" id="customdiv" pdfinsert="Images/InsertSample.pdf">
+            <div style="clear: left; page-break-before: always" id="customdiv" pdfinsert="Images/InsertSample.pdf">
                 <h2 id="Custom">
                     <input class="noprint" name="customdiv" type="checkbox">
                         <a class="noprint nodec" id="printit" href="#"
@@ -1527,6 +1587,18 @@ function randomData(){
         chart.area(seriesData_3).color('#EEEE25').fill(fillFunction);
 
         chart.draw();
+        
+        var clearLastDiv = function() {
+            var div = $('div').filter(':last');            
+            if($(div).find('g').children().length == 0) {
+                $(div).remove();
+            }
+            var svg = $('svg').filter(':last');
+            if($(svg).attr('width') == '0' && $(svg).attr('height') == '0') {
+                $(svg).remove();
+            }
+        }
+        setTimeout(clearLastDiv, 500);
     });
 
 </script>

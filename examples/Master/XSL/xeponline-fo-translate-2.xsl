@@ -252,27 +252,29 @@ Public License for more details from the following URL: http://www.gnu.org/licen
               <xsl:with-param name="elem" select="."/>
               <xsl:with-param name="type" select="name()"/>
             </xsl:call-template>
-            <fo:block>
-              <xsl:apply-templates select="node()"/>  
-            </fo:block>
+            <xsl:apply-templates select="node()"/>  
           </fo:block>
         </xsl:when>
         <xsl:otherwise>
           <!-- To Do, support floats -->
           <fo:float float="{$floatType}" clear="none">
-            <xsl:variable name="width">
+            <xsl:variable name="clear">
               <xsl:call-template name="extractCSSStyle">
                 <xsl:with-param name="css" select="@style"/>
-                <xsl:with-param name="style" select="'width:'"/>
+                <xsl:with-param name="style" select="'clear:'"/>
               </xsl:call-template>
             </xsl:variable>
-            <fo:block-container width="{$width}">
+            <xsl:if test="string-length($clear) > 0">
+              <xsl:attribute name="clear">
+                <xsl:value-of select="$clear"/>
+              </xsl:attribute>
+            </xsl:if>
+            <fo:block-container>
               <xsl:call-template name="processAttr">
                 <xsl:with-param name="elem" select="."/>
                 <xsl:with-param name="type" select="name()"/>
               </xsl:call-template>
               <fo:block>
-
                 <xsl:apply-templates/>
               </fo:block>
             </fo:block-container>
@@ -886,6 +888,17 @@ Public License for more details from the following URL: http://www.gnu.org/licen
     <fo:block>
       <xsl:apply-templates select="node()"/>
     </fo:block>
+  </xsl:template>
+  <xsl:template match="block-container">
+    <fo:block-container>
+      <xsl:call-template name="processAttr">
+        <xsl:with-param name="elem" select="."/>
+        <xsl:with-param name="type" select="name()"/>
+      </xsl:call-template>
+      <fo:block>
+      <xsl:apply-templates select="node()"/>
+      </fo:block>
+    </fo:block-container>
   </xsl:template>
   <xsl:template match="pagenum">
     <fo:inline>
