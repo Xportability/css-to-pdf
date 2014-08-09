@@ -1151,14 +1151,14 @@ we support the "pre" element.</pre>
                     </div>
                 </div>
             </div>
-            <div style="clear: left; page-break-before: always" id="customdiv" pdfinsert="Images/InsertSample.pdf">
+            <div style="clear: left; page-break-before: always" id="customdiv">
                 <h2 id="Custom">
                     <input class="noprint" name="customdiv" type="checkbox">
                         <a class="noprint nodec" id="printit" href="#"
                     onclick="return xepOnline.Formatter.Format('customdiv',{pageMargin:'0.5in'});"
                             ><img src="Images/button-print.png" />
                     </a>Custom Tips and Tricks</h2>
-                <header style="display:none; margin-top:32px;" >
+                <header style="display:none; margin-top:32px;" page-background="Images/secret.pdf">
                     <table width="100%">
                         <tr>
                             <td>Custom Tips &amp; Tricks</td>
@@ -1169,6 +1169,10 @@ we support the "pre" element.</pre>
                 <footer style="display:none">
                     <p class="foot">Page <pagenum></pagenum>&nbsp;of&nbsp;<totpages></totpages></p>
                 </footer>
+                <h3>Background Images</h3>
+                <p>This section when printed alone or printed through selecting individual sections shows that you can 
+                inject a background image behind the page. This is accomplished using a "page-background" attribute 
+                as part of the &lt;header&gt; tag for this section.</p>
                 <h3>Pass-Through XSL FO Styling</h3>
                 <p style="color: brown; text-align:justify;"
                     fostyle="text-align-last: left; font-stretch: wider; font-size-adjust:0.6; hyphenate: true; color:rgb-icc (255, 255, 0, #CMYK, .1, .2, .7, .5);"
