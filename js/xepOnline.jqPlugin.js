@@ -8,24 +8,24 @@ String.prototype.fromCamel = function(){
 var xepOnline = window.xepOnline || {};
 
 xepOnline.IE = function() {
-    var ua = window.navigator.userAgent;
-    var msie = ua.indexOf('MSIE ');
-    var trident = ua.indexOf('Trident/');
+	var ua = window.navigator.userAgent;
+	var msie = ua.indexOf('MSIE ');
+	var trident = ua.indexOf('Trident/');
 
-    if (msie > 0) {
-        // IE 10 or older => return version number
-        return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-    }
+	if (msie > 0) {
+		// IE 10 or older => return version number
+		return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+	}
 
-    if (trident > 0) {
-        // IE 11 (or newer) => return version number
-        var rv = ua.indexOf('rv:');
-        //return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-        return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10) >= 11;
-    }
+	if (trident > 0) {
+		// IE 11 (or newer) => return version number
+		var rv = ua.indexOf('rv:');
+		//return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+		return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10) >= 11;
+	}
 
-    // other browser
-    return false;
+	// other browser
+	return false;
 }
 
 // TODO: better mobile check
@@ -39,88 +39,133 @@ xepOnline.mobilecheck = function() {
 xepOnline.DEFAULTS = {
 	pageWidth:"8.5in",
 	pageHeight:"11in",
-	pageMargin:".25in"
+	pageMargin:".50in"
 };
 
+// TODO: better media ignore method, maybe poke the css stylesheet to verify this is "the" bootstrap.css media to ignore
+xepOnline.MEDIA_IGNORE = [
+	"bootstrap.css"
+]
+
 xepOnline.Formatter = {
-	clean_tags: ['img', 'br', 'input'],
+	clean_tags: ['img', 'hr', 'br', 'input', 'col ', 'embed', 'param'],
+	fo_attributes_root: [
+			'color', 
+			'height',
+			'fontStyle', 'fontVariant', 'fontWeight', 'fontSize', 'fontFamily', 
+			'textAlign',
+			'width'
+	],
 	fo_attributes: [
 			'lineHeight', 
 			'alignmentBaseline', 
-            'backgroundImage', 'backgroundPosition', 'backgroundRepeat', 'backgroundColor',
-            'baselineShift', 
-            'borderTopWidth','borderTopStyle','borderTopColor', 
-            'borderBottomWidth','borderBottomStyle','borderBottomColor',
-            'borderLeftWidth','borderLeftStyle','borderLeftColor',
-            'borderRightWidth','borderRightStyle','borderRightColor',
-            'borderCollapse',             
-            'clear', 'color', 
-            'display', 'direction', 'dominantBaseline', 
-            'fill', 'float', 
-            'fontStyle', 'fontVariant', 'fontWeight', 'fontSize', 'fontFamily', 
-            'height',
-            'listStyleType', 'listStyleImage', 'letterSpacing', 
-            'marginTop', 'marginBottom', 'marginLeft', 'marginRight','orphans', 
-            'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
-            'pageBreakAfter', 'pageBreakBefore', 
-            'tableLayout', 
-            'textAlign', 'textAnchor','textDecoration', 'textIndent', 'textTransform', 'textShadow',
-            'verticalAlign',
-            'widows', 'wordSpacing', 'width'],            
-	getRealStyle: function(elm) {
-	    var returnObj = {};
-	    for(var i=0; i<xepOnline.Formatter.fo_attributes.length; i++) {
-	        returnObj[xepOnline.Formatter.fo_attributes[i]] = $(elm).css(xepOnline.Formatter.fo_attributes[i]);
-	    }
-	    return returnObj;
+			'backgroundImage', 'backgroundPosition', 'backgroundRepeat', 'backgroundColor',
+			'baselineShift', 
+			'borderTopWidth','borderTopStyle','borderTopColor', 
+			'borderBottomWidth','borderBottomStyle','borderBottomColor',
+			'borderLeftWidth','borderLeftStyle','borderLeftColor',
+			'borderRightWidth','borderRightStyle','borderRightColor',
+			'borderCollapse',             
+			'clear', 'color', 
+			'display', 'direction', 'dominantBaseline', 
+			'fill', 'float', 
+			'fontStyle', 'fontVariant', 'fontWeight', 'fontSize', 'fontFamily', 
+			'height',
+			'listStyleType', 'listStyleImage', 
+			'marginTop', 'marginBottom', 'marginLeft', 'marginRight','orphans', 
+			'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+			'pageBreakAfter', 'pageBreakBefore', 
+			'tableLayout', 
+			'textAlign', 'textAnchor','textDecoration', 'textIndent', 'textTransform', 'textShadow',
+			'verticalAlign',
+			'widows', 'width'],            
+	getRealStyle: function(elm, attributes) {
+		var returnObj = {};
+		var computed = getComputedStyle(elm);
+		for(var i=0; i<attributes.length; i++) {
+			returnObj[attributes[i]] = computed[attributes[i]];
+		}
+		return returnObj;
 	},
-	copyComputedStyle: function(elm, dest, parentStyle) {
-	    parentStyle = parentStyle || {}; 
-	    var s = xepOnline.Formatter.getRealStyle(elm);
-	    for ( var i in s ) {
-	        var currentCss = $(elm).css(i);
-	        // ignore duplicate "inheritable" properties
-	        if(parentStyle[i] && parentStyle[i] === currentCss) { } else { 
-	            // The try is for setter only properties
-	            try {
-	                dest.style[i] = s[i];
-	                // `fontSize` comes before `font` If `font` is empty, `fontSize` gets
-	                // overwritten.  So make sure to reset this property. (hackyhackhack)
-	                // Other properties may need similar treatment
-	                if ( i == "font" ) {
-	                    dest.style.fontSize = s.fontSize;
-	                }
-	            } catch (e) {}
-	        }
-	    }
+	copyComputedStyle: function(elm, dest, parentStyle, attributes) {
+		parentStyle = parentStyle || {}; 
+		var s = xepOnline.Formatter.getRealStyle(elm, attributes);
+		for ( var i in s ) {
+			var currentCss = s[i];
+
+			// ignore duplicate "inheritable" properties
+			if(parentStyle !== undefined && (parentStyle[i] && parentStyle[i] === currentCss)) { } else { 
+				// The try is for setter only properties
+				try {
+					dest.style[i] = s[i];
+					// `fontSize` comes before `font` If `font` is empty, `fontSize` gets
+					// overwritten.  So make sure to reset this property. (hackyhackhack)
+					// Other properties may need similar treatment
+					if ( i == "font" ) {
+						dest.style.fontSize = s.fontSize;
+					}
+				} catch (e) {}
+			}
+		}
 	},
-	// NOTDONE: this is not done and probably wont work as the correction needs to happen
-	// in the text print copy and not the DOM
-	// properly close tags: img, br, 
-	cleanTags: function(PrintCopy) {
-
-	    var result = PrintCopy.replace(/(<img("[^"]*"|[^\/">])*)>/g, "$1/>");
-		result = result.replace(/(<br("[^"]*"|[^\/">])*)>/g, "$1/>");
-		result = result.replace(/(<input("[^"]*"|[^\/">])*)>/g, "$1/>");
-		result = result.replace(/(<embed("[^"]*"|[^\/">])*)>/g, "$1/>");
-		result = result.replace(/(<param("[^"]*"|[^\/">])*)>/g, "$1/>");
-		return result;
-
-		/*for(var i=0; i<xepOnline.Formatter.clean_tags.length; i++) {
-			$(elm).find(xepOnline.Formatter.clean_tags[i]).each(function(itt, tag) {
-				var copy = $(tag).clone();
-				$(tag).remove();
+	computeTableCols: function(dest) {
+		jQuery('table').each(function() {
+			var table = this;
+			jQuery(table).find('col,colgroup').each(function() {
+				jQuery(this).attr('xeponline-drop-me',true);
 			});
-		}*/
+
+				var cols = 0;
+				jQuery.find('td,th', jQuery('tr',table)[0]).each(function(td) { cols += Number((Number(jQuery(td).attr('colspan'))) ? (jQuery(td).attr('colspan')): 1); })
+				var tbody = new Element('tbody');
+				var tr = new Element('tr');
+				jQuery(tbody).append(tr);
+
+				for(var i = 0; i<cols; i++) {
+					jQuery(tr).append('<td style="padding:0; margin:0">&#x200b;</td>');
+				}
+
+				// append tbody after everything else
+				jQuery(table).append(tbody);
+				var widths = [];
+				jQuery(jQuery('tr',tbody)[0]).find('td,th').each(function() { 
+					widths.push(jQuery(this).css('width').replace('px',''));
+				});
+
+				// remove any original col groups and widths
+				jQuery(table).find('[xeponline-drop-me=true]').remove();
+				jQuery(table).find('td,th').css('width','');
+
+				var colgroup = new Element('colgroup');
+				jQuery(table).prepend(colgroup);
+				for(var i = 0; i<widths.length;i++) {
+					var col = new Element('col');
+					jQuery(col).attr('width', widths[i]);
+					jQuery(colgroup).append(col);
+				}
+				jQuery(tbody).remove();
+		});
+	},
+	cleanTags: function(PrintCopy) {
+		var result = PrintCopy;
+		for(var i=0; i<xepOnline.Formatter.clean_tags.length;i++) {
+			var regx = new RegExp('(<' + xepOnline.Formatter.clean_tags[i] + '("[^"]*"|[^\/">])*)>', 'g');
+			result = result.replace(regx, '$1/>');
+		}
+		return result;
 	},
 	flattenStyle: function(elm) {
-	    // parent
-	    xepOnline.Formatter.copyComputedStyle(elm, elm, xepOnline.Formatter.getRealStyle($('body')[0]));
-	    // children
-	    $(elm).find('*').each(function(index, elm2) {
-	        var parentStyle = xepOnline.Formatter.getRealStyle($(elm2).parent()[0]);
-	        xepOnline.Formatter.copyComputedStyle(elm2, elm2, parentStyle);
-	    });
+		// parent
+		xepOnline.Formatter.copyComputedStyle(elm, elm, undefined, xepOnline.Formatter.fo_attributes_root);
+		// children
+		jQuery(elm).find('*').each(function(index, elm2) {
+			if(elm.tagName.toUpperCase() !== 'SCRIPT') {
+				var parentStyle = xepOnline.Formatter.getRealStyle(jQuery(elm2).parent()[0], xepOnline.Formatter.fo_attributes);
+				xepOnline.Formatter.copyComputedStyle(elm2, elm2, parentStyle, xepOnline.Formatter.fo_attributes);				
+			}
+		});
+		// table columns
+		xepOnline.Formatter.computeTableCols(elm);
 	},
 	getFormTextData: function(PrintCopy) {
 		var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
@@ -134,47 +179,62 @@ xepOnline.Formatter = {
 		var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
 		//DEBUG
 		console.log(data);
-	    var blob;
-	    try
-	    {
-		    blob = new Blob([data],{ type: xepOnline.Formatter.src_type.xml });
-	    }
-	    catch(e) 
-	    {
-	    	if(e.name === 'TypeError') {
-	    		throw new Error('Blob undefined')
-	    	}
-	    }
+		var blob;
+		try
+		{
+			blob = new Blob([data],{ type: xepOnline.Formatter.src_type.xml });
+		}
+		catch(e) 
+		{
+			if(e.name === 'TypeError') {
+				throw new Error('Blob undefined')
+			}
+		}
 
-	    if(blob === undefined) throw new Error('Blob undefined');
+		if(blob === undefined) throw new Error('Blob undefined');
 
-	    var obj = new FormData();
+		var obj = new FormData();
 
-	    obj.append(Name,blob,FileName);
-	    obj.append('mimetype', MimeType);
-	    return obj;
+		obj.append(Name,blob,FileName);
+		obj.append('mimetype', MimeType);
+		return obj;
 	},
 	togglePrintMediaStyle: function() {
-		if($('head style[data-xeponline-formatting]').length > 0) {
-			$('head style[data-xeponline-formatting]').remove();
+		if(jQuery('head style[data-xeponline-formatting]').length > 0) {
+			jQuery('head style[data-xeponline-formatting]').remove();
 			return;
 		}
 		var printrules = [];
 		for(var x=0;x<document.styleSheets.length;x++) { 
+			// ignore media print
+			var skipMedia = false;
+			for(i in xepOnline.MEDIA_IGNORE) {
+				if(document.styleSheets[x].href && document.styleSheets[x].href.indexOf(xepOnline.MEDIA_IGNORE[i]) > 0) {
+					skipMedia = true;
+					break;
+				}
+			}
+
+			if(document.styleSheets[x].href === null || !document.styleSheets[x].href.include(location.host)) skipMedia = true;
+			if(skipMedia) continue;
+			
+
 			var rules=document.styleSheets[x].cssRules;
-			var rule=[];
-			for(var x2=0;x2<rules.length;x2++) {
-				
-				if(rules[x2].media && rules[x2].media && (rules[x2].media[0] === 'print' || 
-					rules[x2].media && rules[x2].media.mediaText === 'print')) {
-					for(var x3=0;x3<rules[x2].cssRules.length; x3++) {
-						rule.push(rules[x2].cssRules[x3]);
+			if(rules) {
+				var rule=[];
+				for(var x2=0;x2<rules.length;x2++) {
+					
+					if(rules[x2].media && rules[x2].media && (rules[x2].media[0] === 'print' || 
+						rules[x2].media && rules[x2].media.mediaText === 'print')) {
+						for(var x3=0;x3<rules[x2].cssRules.length; x3++) {
+							rule.push(rules[x2].cssRules[x3]);
+						}
+					}  else if (rules[x2].parentStyleSheet.media[0] && 
+							rules[x2].parentStyleSheet.media[0] === 'print' ||
+							(rules[x2].parentStyleSheet.media && 
+								rules[x2].parentStyleSheet.media.mediaText === 'print')) {
+						rule.push(rules[x2]);
 					}
-				}  else if (rules[x2].parentStyleSheet.media[0] && 
-						rules[x2].parentStyleSheet.media[0] === 'print' ||
-						(rules[x2].parentStyleSheet.media && 
-							rules[x2].parentStyleSheet.media.mediaText === 'print')) {
-					rule.push(rules[x2]);
 				}
 			}
 			for(var x2=0;x2<rule.length;x2++) {
@@ -188,7 +248,7 @@ xepOnline.Formatter = {
 			html+='.xeponline-container ' + printrules[x] + '\n';
 		}
 		html += '</style>\n';
-		$('head').append(html);
+		jQuery('head').append(html);
 	},
 	getFOContainer: function(options) {
 		options 			= options || {};
@@ -196,8 +256,8 @@ xepOnline.Formatter = {
 		options.pageHeight 	= options.pageHeight || xepOnline.DEFAULTS.pageHeight;
 		options.pageMargin 	= options.pageMargin || xepOnline.DEFAULTS.pageMargin;
 
-		var container = $('<div class=\'xeponline-container\'></div>');
-		var margincontainer = $('<div class=\'margin-container\'></div>');
+		var container = jQuery('<div class=\'xeponline-container\'></div>');
+		var margincontainer = jQuery('<div class=\'margin-container\'></div>');
 		container.append(margincontainer);
 		var stylebuilder = '';
 		var stylebuildermargin = '';
@@ -235,9 +295,9 @@ xepOnline.Formatter = {
 		return container;
 	},
 	getBase: function() {
-	    var pathname = $(location).attr('pathname').substring(0, $(location).attr('pathname').lastIndexOf('/') + 1);
-    	var base = $(location).attr('protocol') + '//' + $(location).attr('hostname') + pathname;
-    	return base;
+		var pathname = jQuery(location).attr('pathname').substring(0, jQuery(location).attr('pathname').lastIndexOf('/') + 1);
+		var base = jQuery(location).attr('protocol') + '//' + jQuery(location).attr('hostname') + pathname;
+		return base;
 	},
 	// IE Hack!
 	cleanSVGDeclarations: function(data) {
@@ -307,31 +367,31 @@ xepOnline.Formatter = {
 			options.render = 'download';
 		}
 
-         var printcopy = '';
-        $(ElementIDs).each(function(index, ElementID){
-           xepOnline.Formatter.__elm = $('#' + ElementID)[0];
-		   xepOnline.Formatter.__clone = $(xepOnline.Formatter.__elm)[0].outerHTML;
+		 var printcopy = '';
+		jQuery(ElementIDs).each(function(index, ElementID){
+		   xepOnline.Formatter.__elm = jQuery('#' + ElementID)[0];
+		   xepOnline.Formatter.__clone = jQuery(xepOnline.Formatter.__elm)[0].outerHTML;
 		   xepOnline.Formatter.__container = xepOnline.Formatter.getFOContainer(options);
-		   $('#' + ElementID).after($(xepOnline.Formatter.__container));
-		   $(xepOnline.Formatter.__elm).appendTo($(xepOnline.Formatter.__container).children(1));			
-           xepOnline.Formatter.togglePrintMediaStyle();
-		   xepOnline.Formatter.flattenStyle($(xepOnline.Formatter.__container)[0]);
-		   printcopy = printcopy + xepOnline.Formatter.cleanTags($(xepOnline.Formatter.__container)[0].outerHTML);
-           xepOnline.Formatter.Clear();
-	    });
+		   jQuery('#' + ElementID).after(jQuery(xepOnline.Formatter.__container));
+		   jQuery(xepOnline.Formatter.__elm).appendTo(jQuery(xepOnline.Formatter.__container).children(1));			
+		   xepOnline.Formatter.togglePrintMediaStyle();
+		   xepOnline.Formatter.flattenStyle(jQuery(xepOnline.Formatter.__container)[0]);
+		   printcopy = printcopy + xepOnline.Formatter.cleanTags(jQuery(xepOnline.Formatter.__container)[0].outerHTML);
+		   xepOnline.Formatter.Clear();
+		});
 
-	    if(options.render === 'none') {
-	    	return false;
-	    }
-	    if(options.render === 'embed') {
-	    	xepOnline.Formatter.__container.attr('data-xeponline-embed-pending', 'true');
-	    }
-	    // fix IE double xmlns declerations in SVG
-	    if(xepOnline.IE()) {
-	    	printcopy = xepOnline.Formatter.cleanSVGDeclarations(printcopy);
+		if(options.render === 'none') {
+			return false;
 		}
-	    //Kevin hack for now, stuff the whole thing in a document div
-	    printcopy = '<div base="' + xepOnline.Formatter.getBase() + '" class="xeponline-document">' + printcopy + '</div>';
+		if(options.render === 'embed') {
+			xepOnline.Formatter.__container.attr('data-xeponline-embed-pending', 'true');
+		}
+		// fix IE double xmlns declerations in SVG
+		if(xepOnline.IE()) {
+			printcopy = xepOnline.Formatter.cleanSVGDeclarations(printcopy);
+		}
+		//Kevin hack for now, stuff the whole thing in a document div
+		printcopy = '<div base="' + xepOnline.Formatter.getBase() + '" class="xeponline-document">' + printcopy + '</div>';
 
 		var blob;
 		if(options.render !== 'download') {
@@ -349,43 +409,49 @@ xepOnline.Formatter = {
 			}
 		}
 
-	    if(options.render === 'download') {
-			$('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'temp_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
-			$('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + xepOnline.Formatter.mime_type.pdf + '\'/>');
-			$('#temp_post').append('<textarea name=\'xml\'>' + xepOnline.Formatter.getFormTextData(printcopy) + '</textarea>');
-			$('#temp_post').submit();
-			$('#temp_post').remove();
-	    } else {
-		    $.ajax({
-			    type: "POST",
-			    url: xepOnline.Formatter.xep_chandra_service,
-			    processData: false,
-			    contentType: false,
-			    data: blob,
-		    	success: xepOnline.Formatter.__postBackSuccess,
-		    	error: xepOnline.Formatter.__postBackFailure
-		    });
-	    }
-	    return false; 
-	},
-	FormatGroup: function(ElementIDs, options)
-	{
-		return xepOnline.Formatter.__format(ElementIDs, options);
-	},
+		if(options.render === 'download') {
+			jQuery('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'temp_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
+			jQuery('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + xepOnline.Formatter.mime_type.pdf + '\'/>');
+			jQuery('#temp_post').append('<textarea name=\'xml\'>' + xepOnline.Formatter.getFormTextData(printcopy) + '</textarea>');
+			jQuery('#temp_post').submit();
+			jQuery('#temp_post').remove();
+		} else {
+			jQuery.ajax({
+				type: "POST",
+				url: xepOnline.Formatter.xep_chandra_service,
+				processData: false,
+				contentType: false,
+				data: blob,
+				success: xepOnline.Formatter.__postBackSuccess,
+				error: xepOnline.Formatter.__postBackFailure
+			});
+		}
+		return false; 
+	},	
 	Format: function(ElementID, options) {
-		return xepOnline.Formatter.__format([ElementID], options);
+		var items;
+		if(jQuery.isArray(ElementID)) {
+			items = ElementID;
+		} else {
+			items = [ ElementID ];
+		}
+		return xepOnline.Formatter.__format(items, options);
+	},
+	// deprecated - use Format 
+	FormatGroup: function(ElementID, options) {
+		return xepOnline.Formatter.Format(ElementID, options);
 	},
 	Clear: function() {
-		if($(xepOnline.Formatter.__container).length===0 || 
-			$(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true')
+		if(jQuery(xepOnline.Formatter.__container).length===0 || 
+			jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true')
 			return;			
 
-		$(xepOnline.Formatter.__container).after(xepOnline.Formatter.__clone);
-		$(xepOnline.Formatter.__container).remove();
-	    xepOnline.Formatter.togglePrintMediaStyle();
+		jQuery(xepOnline.Formatter.__container).after(xepOnline.Formatter.__clone);
+		jQuery(xepOnline.Formatter.__container).remove();
+		xepOnline.Formatter.togglePrintMediaStyle();
 	},
 	__postBackSuccess: function(Response) {
-		var base64PDF = $(Response).find("Result").text();
+		var base64PDF = jQuery(Response).find("Result").text();
 
 		var objbuilder = '';
 		objbuilder += ('<object width="100%" height="100%" data="data:application/pdf;base64,');
@@ -396,11 +462,11 @@ xepOnline.Formatter = {
 		objbuilder += ('" type="application/pdf" />');
 		objbuilder += ('</object>');
 
-		if($(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true') {			
-			$(xepOnline.Formatter.__elm).remove();
-			$(xepOnline.Formatter.__container).append(objbuilder);
-			$(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending', null);
-			$(xepOnline.Formatter.__container).attr('data-xeponline-embed', 'true');
+		if(jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true') {			
+			jQuery(xepOnline.Formatter.__elm).remove();
+			jQuery(xepOnline.Formatter.__container).append(objbuilder);
+			jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending', null);
+			jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed', 'true');
 		} else {
 			// TODO: try catch window open "pop-up blocker"
 			var win = window.open("","_blank","titlebar=yes");
@@ -408,7 +474,7 @@ xepOnline.Formatter = {
 			win.document.write('<html><body>');
 			win.document.write(objbuilder);
 			win.document.write('</body></html>');
-			layer = $(win.document);
+			layer = jQuery(win.document);
 		}
 
 	},
