@@ -75,6 +75,8 @@ xepOnline.Formatter = {
 			'marginTop', 'marginBottom', 'marginLeft', 'marginRight','orphans', 
 			'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
 			'pageBreakAfter', 'pageBreakBefore', 
+			'stroke', 'strokeWidth',
+			'strokeOpacity', 'fillOpacity',
 			'tableLayout', 
 			'textAlign', 'textAnchor','textDecoration', 'textIndent', 'textTransform', 'textShadow',
 			'verticalAlign',
@@ -116,9 +118,9 @@ xepOnline.Formatter = {
 			});
 
 				var cols = 0;
-				jQuery.find('td,th', jQuery('tr',table)[0]).each(function(td) { cols += Number((Number(jQuery(td).attr('colspan'))) ? (jQuery(td).attr('colspan')): 1); })
-				var tbody = new Element('tbody');
-				var tr = new Element('tr');
+				jQuery(jQuery.find('td,th',jQuery('tr',table)[0])).each(function(td) { cols += Number((Number(jQuery(td).attr('colspan'))) ? (jQuery(td).attr('colspan')): 1); })
+				var tbody = jQuery('<tbody>');
+				var tr = jQuery('<tr>');
 				jQuery(tbody).append(tr);
 
 				for(var i = 0; i<cols; i++) {
@@ -128,7 +130,7 @@ xepOnline.Formatter = {
 				// append tbody after everything else
 				jQuery(table).append(tbody);
 				var widths = [];
-				jQuery(jQuery('tr',tbody)[0]).find('td,th').each(function() { 
+				jQuery(jQuery(jQuery('tr',tbody)[0])).find('td,th').each(function() { 
 					widths.push(jQuery(this).css('width').replace('px',''));
 				});
 
@@ -136,10 +138,10 @@ xepOnline.Formatter = {
 				jQuery(table).find('[xeponline-drop-me=true]').remove();
 				jQuery(table).find('td,th').css('width','');
 
-				var colgroup = new Element('colgroup');
+				var colgroup = jQuery('<colgroup>');
 				jQuery(table).prepend(colgroup);
 				for(var i = 0; i<widths.length;i++) {
-					var col = new Element('col');
+					var col = jQuery('<col>');
 					jQuery(col).attr('width', widths[i]);
 					jQuery(colgroup).append(col);
 				}
@@ -159,9 +161,25 @@ xepOnline.Formatter = {
 		xepOnline.Formatter.copyComputedStyle(elm, elm, undefined, xepOnline.Formatter.fo_attributes_root);
 		// children
 		jQuery(elm).find('*').each(function(index, elm2) {
-			if(elm.tagName.toUpperCase() !== 'SCRIPT') {
-				var parentStyle = xepOnline.Formatter.getRealStyle(jQuery(elm2).parent()[0], xepOnline.Formatter.fo_attributes);
-				xepOnline.Formatter.copyComputedStyle(elm2, elm2, parentStyle, xepOnline.Formatter.fo_attributes);				
+			switch(elm2.tagName) {
+				case 'IFRAME':
+					try {
+						var content = jQuery(jQuery(xepOnline.Formatter.__elm).find('iframe[src="' + jQuery(elm2).attr('src') + '"]')[0].contentDocument).find('[contenteditable]');
+						var iflat = jQuery('<div data-xeponline-formatting=\'i-flat\'></div>');
+						iflat.html(content.html());				
+						content.after(iflat);
+						xepOnline.Formatter.flattenStyle(iflat[0]);
+						jQuery(elm2).after(iflat);
+						
+					} catch(e) {}
+				case 'SCRIPT':
+				// ignore these tags
+				break;
+				default:
+					var parentStyle = xepOnline.Formatter.getRealStyle(jQuery(elm2).parent()[0], xepOnline.Formatter.fo_attributes);
+					xepOnline.Formatter.copyComputedStyle(elm2, elm2, parentStyle, xepOnline.Formatter.fo_attributes);				
+				break;
+
 			}
 		});
 		// table columns
@@ -208,18 +226,23 @@ xepOnline.Formatter = {
 		for(var x=0;x<document.styleSheets.length;x++) { 
 			// ignore media print
 			var skipMedia = false;
-			for(i in xepOnline.MEDIA_IGNORE) {
+			for(var i = 0; i < xepOnline.MEDIA_IGNORE.length; i++) {
 				if(document.styleSheets[x].href && document.styleSheets[x].href.indexOf(xepOnline.MEDIA_IGNORE[i]) > 0) {
 					skipMedia = true;
 					break;
 				}
 			}
 
-			if(document.styleSheets[x].href === null || !document.styleSheets[x].href.include(location.host)) skipMedia = true;
+			if(document.styleSheets[x].href === null || (document.styleSheets[x].href.indexOf(location.host) === 0)) skipMedia = true;
 			if(skipMedia) continue;
-			
 
-			var rules=document.styleSheets[x].cssRules;
+			var rules;			
+			// try catch - some browsers don't allow to read css stylesheets
+			try
+			{
+				var rules=document.styleSheets[x].cssRules;
+			} catch(e) {}	
+
 			if(rules) {
 				var rule=[];
 				for(var x2=0;x2<rules.length;x2++) {
@@ -280,12 +303,12 @@ xepOnline.Formatter = {
 			stylebuildermargin += 'margin-left: ' + options.pageMarginLeft + '; ';
 		}
 		if(options && options.cssStyle) {
-			for(s in options.cssStyle) { 
+			for(var s = 0; s < options.cssStyle.length; s++) { 
 				stylebuilder += s.fromCamel() + ': ' + options.cssStyle[s] + '; ';				
 			}
 		}
 		if(options && options.foStyle) {
-			for(s in options.foStyle) { 
+			for(var s = 0; s < options.foStyle.length; s++) { 
 				fostylebuilder += s.fromCamel() + ': ' + options.foStyle[s] + '; ';				
 			}
 		}
@@ -318,8 +341,8 @@ xepOnline.Formatter = {
 			builder += '<svg';
 			// add back name values
 			var svgdec_flag = false;
-			var namevalues;
-			for(s in namevalues = match[0].match(/([^< =,]*)=("[^"]*"|[^,"]*)/ig)) {
+			var namevalues = match[0].match(/([^< =,]*)=("[^"]*"|[^,"]*)/ig);
+			for(var s = 0; s<namevalues.length; s++) {
 				if(namevalues[s] === svgdec_text && svgdec_flag) { } else {
 					builder += ' ' + namevalues[s];
 				}
@@ -339,7 +362,7 @@ xepOnline.Formatter = {
 	entity_declaration:'<!DOCTYPE div [  <!ENTITY % winansi SYSTEM "http://xep.cloudformatter.com/doc/XSL/winansi.xml">  %winansi;]>',
 	xsl_stylesheet_declaration: '<?xml-stylesheet type="text/xsl" href="http://xep.cloudformatter.com/Doc/XSL/xeponline-fo-translate-2.xsl"?>',
 	src_type: { xml: 'text/xml'},
-	mime_type: { pdf: 'application/pdf'},
+	mime_type: { pdf: 'application/pdf', svg: 'image/svg+xml'},
 	/* options	
 		{
 			pageWidth: "8.5in", 				// reserved for the FO region-body (next 7)
@@ -350,6 +373,7 @@ xepOnline.Formatter = {
 			pageMarginBottom: "1in",
 			pageMarginLeft: "1in",
 			pageMediaResource: "name_of_css_stylesheet",
+			mimeType: ("application/pdf<default>"|"image/svg+xml"),
 			render: ("none"|"newwin<default>"|embed"|"download<default IE>"),
 			cssStyle: {							// puts css style attributes on the root, ex. fontSize:14px
 						cssStyleName: 'value', ...
@@ -362,7 +386,7 @@ xepOnline.Formatter = {
 	__format: function(ElementIDs, options) {
 		options = options || {};
 		options.render = (options.render === undefined) ? 'newwin' : options.render;
-
+		options.mimeType = (options.mimeType === undefined) ? xepOnline.Formatter.mime_type.pdf : options.mimeType;
 		if(xepOnline.IE() || xepOnline.mobilecheck()) {
 			options.render = 'download';
 		}
@@ -370,10 +394,16 @@ xepOnline.Formatter = {
 		 var printcopy = '';
 		jQuery(ElementIDs).each(function(index, ElementID){
 		   xepOnline.Formatter.__elm = jQuery('#' + ElementID)[0];
+		   if(!xepOnline.Formatter.__elm) {
+		   	throw new Error('Missing or invalid selector');
+		   }
+
 		   xepOnline.Formatter.__clone = jQuery(xepOnline.Formatter.__elm)[0].outerHTML;
 		   xepOnline.Formatter.__container = xepOnline.Formatter.getFOContainer(options);
-		   jQuery('#' + ElementID).after(jQuery(xepOnline.Formatter.__container));
-		   jQuery(xepOnline.Formatter.__elm).appendTo(jQuery(xepOnline.Formatter.__container).children(1));			
+
+			jQuery('#' + ElementID).after(jQuery(xepOnline.Formatter.__container));
+			jQuery(xepOnline.Formatter.__clone).appendTo(jQuery(xepOnline.Formatter.__container).children(1));		
+
 		   xepOnline.Formatter.togglePrintMediaStyle();
 		   xepOnline.Formatter.flattenStyle(jQuery(xepOnline.Formatter.__container)[0]);
 		   printcopy = printcopy + xepOnline.Formatter.cleanTags(jQuery(xepOnline.Formatter.__container)[0].outerHTML);
@@ -397,7 +427,7 @@ xepOnline.Formatter = {
 		if(options.render !== 'download') {
 			try 
 			{
-				blob = xepOnline.Formatter.getFormData(printcopy, 'xml', xepOnline.Formatter.mime_type.pdf, 'document.xml');
+				blob = xepOnline.Formatter.getFormData(printcopy, 'xml', options.mimeType, 'document.xml');
 			} catch(e) 
 			{
 				// switch render to download if blob undefined
@@ -411,7 +441,7 @@ xepOnline.Formatter = {
 
 		if(options.render === 'download') {
 			jQuery('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'temp_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
-			jQuery('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + xepOnline.Formatter.mime_type.pdf + '\'/>');
+			jQuery('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + options.mimeType + '\'/>');
 			jQuery('#temp_post').append('<textarea name=\'xml\'>' + xepOnline.Formatter.getFormTextData(printcopy) + '</textarea>');
 			jQuery('#temp_post').submit();
 			jQuery('#temp_post').remove();
@@ -446,7 +476,6 @@ xepOnline.Formatter = {
 			jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true')
 			return;			
 
-		jQuery(xepOnline.Formatter.__container).after(xepOnline.Formatter.__clone);
 		jQuery(xepOnline.Formatter.__container).remove();
 		xepOnline.Formatter.togglePrintMediaStyle();
 	},
@@ -463,10 +492,9 @@ xepOnline.Formatter = {
 		objbuilder += ('</object>');
 
 		if(jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true') {			
-			jQuery(xepOnline.Formatter.__elm).remove();
-			jQuery(xepOnline.Formatter.__container).append(objbuilder);
-			jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending', null);
-			jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed', 'true');
+			jQuery(xepOnline.Formatter.__elm).html(objbuilder);
+			jQuery(xepOnline.Formatter.__elm).css({'height': xepOnline.DEFAULTS.pageHeight });
+			jQuery(xepOnline.Formatter.__container).remove();
 		} else {
 			// TODO: try catch window open "pop-up blocker"
 			var win = window.open("","_blank","titlebar=yes");
@@ -476,7 +504,6 @@ xepOnline.Formatter = {
 			win.document.write('</body></html>');
 			layer = jQuery(win.document);
 		}
-
 	},
 	__postBackFailure: function (request, status, error){
 		alert('Woops, an exception occurred.  Please try again.');
