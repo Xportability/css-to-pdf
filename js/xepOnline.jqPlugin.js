@@ -259,9 +259,9 @@ xepOnline.Formatter = {
 						rule.push(rules[x2]);
 					}
 				}
-			}
-			for(var x2=0;x2<rule.length;x2++) {
-				printrules.push(rule[x2].cssText);	
+				for(var x2=0;x2<rule.length;x2++) {
+					printrules.push(rule[x2].cssText);	
+				}
 			}
 		}
 
