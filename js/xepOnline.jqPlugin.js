@@ -164,6 +164,8 @@ xepOnline.Formatter = {
 			switch(elm2.tagName) {
 				case 'IFRAME':
 					try {
+						// HACK! selector in iframe goes after [contenteditable] 
+						// this to become an optional sub-selector for content iframe somehow in future
 						var content = jQuery(jQuery(xepOnline.Formatter.__elm).find('iframe[src="' + jQuery(elm2).attr('src') + '"]')[0].contentDocument).find('[contenteditable]');
 						var iflat = jQuery('<div data-xeponline-formatting=\'i-flat\'></div>');
 						iflat.html(content.html());				
