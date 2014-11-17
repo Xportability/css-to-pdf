@@ -118,7 +118,7 @@ xepOnline.Formatter = {
 			});
 
 				var cols = 0;
-				jQuery(jQuery.find('td,th',jQuery('tr',table)[0])).each(function(td) { cols += Number((Number(jQuery(td).attr('colspan'))) ? (jQuery(td).attr('colspan')): 1); })
+				jQuery(jQuery.find('td,th',jQuery('tr',table)[0])).each(function() { var td=this; cols += Number((Number(jQuery(td).attr('colspan'))) ? (jQuery(td).attr('colspan')): 1); })
 				var tbody = jQuery('<tbody>');
 				var tr = jQuery('<tr>');
 				jQuery(tbody).append(tr);
@@ -197,8 +197,28 @@ xepOnline.Formatter = {
 	},
 	getFormData: function(PrintCopy, Name, MimeType, FileName) {
 		var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
-		//DEBUG
-		console.log(data);
+		var blob;
+		try
+		{
+			blob = new Blob([data],{ type: xepOnline.Formatter.src_type.xml });
+		}
+		catch(e) 
+		{
+			if(e.name === 'TypeError') {
+				throw new Error('Blob undefined')
+			}
+		}
+
+		if(blob === undefined) throw new Error('Blob undefined');
+
+		var obj = new FormData();
+
+		obj.append(Name,blob,FileName);
+		obj.append('mimetype', MimeType);
+		return obj;
+	},
+	getFormXslFoData: function(PrintCopy, Name, FileName) {
+		var data = xepOnline.Formatter.entity_declaration + PrintCopy;
 		var blob;
 		try
 		{
@@ -359,8 +379,47 @@ xepOnline.Formatter = {
 
 		return builder += (data || '');
 	},
+	__generatePrintCopy: function(Elements, options) {
+		options = options || {};
+		var printcopy = '';
+		jQuery(Elements).each(function(){
+		   xepOnline.Formatter.__elm = jQuery(this)[0];
+		   if(!xepOnline.Formatter.__elm) {
+		   	throw new Error('Missing or invalid selector');
+		   }
+
+		   xepOnline.Formatter.__clone = jQuery(this)[0].outerHTML;
+		   xepOnline.Formatter.__container = xepOnline.Formatter.getFOContainer(options);
+
+			jQuery(this).after(jQuery(xepOnline.Formatter.__container));
+			jQuery(xepOnline.Formatter.__clone).appendTo(jQuery(xepOnline.Formatter.__container).children(1));		
+
+		   xepOnline.Formatter.togglePrintMediaStyle();
+		   xepOnline.Formatter.flattenStyle(jQuery(xepOnline.Formatter.__container)[0]);
+		   printcopy = printcopy + xepOnline.Formatter.cleanTags(jQuery(xepOnline.Formatter.__container)[0].outerHTML);
+		   xepOnline.Formatter.Clear();
+		});
+
+		if(options.render === 'none') {
+			return false;
+		}
+		if(options.render === 'embed') {
+			xepOnline.Formatter.__container.attr('data-xeponline-embed-pending', 'true');
+		}
+		// fix IE double xmlns declerations in SVG
+		if(xepOnline.IE()) {
+			printcopy = xepOnline.Formatter.cleanSVGDeclarations(printcopy);
+		}
+		var xeponlinedoc = jQuery('<div base="' + xepOnline.Formatter.getBase() + '" class="xeponline-document"></div');
+		if(jQuery(Elements).attr('data-pattern')) {
+			 jQuery(xeponlinedoc).attr('data-pattern', jQuery(Elements).attr('data-pattern'));
+		}
+		jQuery(xeponlinedoc).html(printcopy);
+		return xeponlinedoc[0].outerHTML;
+	},
 	xep_chandra_service: 'http://xep.cloudformatter.com/Chandra.svc/genpackage',
 	xep_chandra_service_AS_PDF: 'http://xep.cloudformatter.com/Chandra.svc/genfile',
+	xep_chandra_service_XslFO: 'http://xeponlinebeta.cloudformatter.com/Chandra.svc/genxslfo',
 	entity_declaration:'<!DOCTYPE div [  <!ENTITY % winansi SYSTEM "http://xep.cloudformatter.com/doc/XSL/winansi.xml">  %winansi;]>',
 	xsl_stylesheet_declaration: '<?xml-stylesheet type="text/xsl" href="http://xep.cloudformatter.com/Doc/XSL/xeponline-fo-translate-2.xsl"?>',
 	src_type: { xml: 'text/xml'},
@@ -385,7 +444,7 @@ xepOnline.Formatter = {
 					}			
 		}
 	*/
-	__format: function(ElementIDs, options) {
+	__format: function(Elements, options) {
 		options = options || {};
 		options.render = (options.render === undefined) ? 'newwin' : options.render;
 		options.mimeType = (options.mimeType === undefined) ? xepOnline.Formatter.mime_type.pdf : options.mimeType;
@@ -393,37 +452,7 @@ xepOnline.Formatter = {
 			options.render = 'download';
 		}
 
-		 var printcopy = '';
-		jQuery(ElementIDs).each(function(index, ElementID){
-		   xepOnline.Formatter.__elm = jQuery('#' + ElementID)[0];
-		   if(!xepOnline.Formatter.__elm) {
-		   	throw new Error('Missing or invalid selector');
-		   }
-
-		   xepOnline.Formatter.__clone = jQuery(xepOnline.Formatter.__elm)[0].outerHTML;
-		   xepOnline.Formatter.__container = xepOnline.Formatter.getFOContainer(options);
-
-			jQuery('#' + ElementID).after(jQuery(xepOnline.Formatter.__container));
-			jQuery(xepOnline.Formatter.__clone).appendTo(jQuery(xepOnline.Formatter.__container).children(1));		
-
-		   xepOnline.Formatter.togglePrintMediaStyle();
-		   xepOnline.Formatter.flattenStyle(jQuery(xepOnline.Formatter.__container)[0]);
-		   printcopy = printcopy + xepOnline.Formatter.cleanTags(jQuery(xepOnline.Formatter.__container)[0].outerHTML);
-		   xepOnline.Formatter.Clear();
-		});
-
-		if(options.render === 'none') {
-			return false;
-		}
-		if(options.render === 'embed') {
-			xepOnline.Formatter.__container.attr('data-xeponline-embed-pending', 'true');
-		}
-		// fix IE double xmlns declerations in SVG
-		if(xepOnline.IE()) {
-			printcopy = xepOnline.Formatter.cleanSVGDeclarations(printcopy);
-		}
-		//Kevin hack for now, stuff the whole thing in a document div
-		printcopy = '<div base="' + xepOnline.Formatter.getBase() + '" class="xeponline-document">' + printcopy + '</div>';
+		 var printcopy = xepOnline.Formatter.__generatePrintCopy(Elements, options);
 
 		var blob;
 		if(options.render !== 'download') {
@@ -460,18 +489,23 @@ xepOnline.Formatter = {
 		}
 		return false; 
 	},	
-	Format: function(ElementID, options) {
-		var items;
-		if(jQuery.isArray(ElementID)) {
-			items = ElementID;
-		} else {
-			items = [ ElementID ];
-		}
-		return xepOnline.Formatter.__format(items, options);
+	Format: function(Elements, options) {
+		return xepOnline.Formatter.__format(Elements, options);
 	},
-	// deprecated - use Format 
-	FormatGroup: function(ElementID, options) {
-		return xepOnline.Formatter.Format(ElementID, options);
+	// generate XSL-FO
+	GenXSLFO: function(Elements,  options) {
+		options = options || {};
+		var printcopy = xepOnline.Formatter.__generatePrintCopy(Elements, options);
+		var blob = xepOnline.Formatter.getFormXslFoData(printcopy, 'xml', 'document.xml');
+			jQuery.ajax({
+				type: "POST",
+				url: xepOnline.Formatter.xep_chandra_service_XslFO,
+				processData: false,
+				contentType: false,
+				data: blob,
+				success: xepOnline.Formatter.__postBackGenXslFO,
+				error: xepOnline.Formatter.__postBackFailureGenXslFO
+			});		
 	},
 	Clear: function() {
 		if(jQuery(xepOnline.Formatter.__container).length===0 || 
@@ -480,6 +514,12 @@ xepOnline.Formatter = {
 
 		jQuery(xepOnline.Formatter.__container).remove();
 		xepOnline.Formatter.togglePrintMediaStyle();
+	},
+	__postBackGenXslFO: function(response) {
+		jQuery(document).trigger('XEPOnline:gen-xsl-fo', response);
+	},
+	__postBackFailureGenXslFO: function(response) {
+		jQuery(document).trigger('XEPOnline:gen-xsl-fo', 'fail');
 	},
 	__postBackSuccess: function(Response) {
 		var base64PDF = jQuery(Response).find("Result").text();
