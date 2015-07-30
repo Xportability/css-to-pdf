@@ -40,32 +40,32 @@ Example: Force the PDF to download rather than embedded in a new window:
 
 # Options
 
-**pageWidth** - [default 8.5in] Printed Media Page Width
-**pageHeight** - [default 11in] Printed Media Page Height
-**pageMargin** - [default 0.5in] Printed Media Page Margin Dimensions (short-hand)
-**pageMarginTop** - Printed Media Page Margin Top Dimension
-**pageMarginRight** - Printed Media Page Margin Right Dimension
-**pageMarginBottom** - Printed Media Page Margin Bottom Dimension
-**pageMarginLeft** - Printed Media Page Margin Left Dimension
-**pageMediaResource** - A fully qualified URL to your own stylesheet
-**cssStyle** - CSS styles to place directly on the container element (to override computed styles)
-**foStyle** - FO styles to place directly on the container element (to override cssStyles during XSL-FO rendering)
-**render** - options to control the result of the rendering
-**none** - Runs the client-side HTML+CSS and media styling without PDF rendering
-**newwin** - [default on Firefox and Chrome] Embeds the rendered PDF into a new window. Client must enable pop-up's for this to work!
-**download** - [default and only option on Internet Explorer and Safari as well as all mobile browsers] After PDF rendering the user is prompted to download and save the PDF result
-**filename** - [default 'document'] Optionally used to name the downloaded file, the server will add the appropriate extension based on the mimetype of the requested document
-**mimeType** - [default 'application/pdf'] Optionally used control the formatter to create the type of result:
+* **pageWidth** - [default 8.5in] Printed Media Page Width
+* **pageHeight** - [default 11in] Printed Media Page Height
+* **pageMargin** - [default 0.5in] Printed Media Page Margin Dimensions (short-hand)
+* **pageMarginTop** - Printed Media Page Margin Top Dimension
+* **pageMarginRight** - Printed Media Page Margin Right Dimension
+* **pageMarginBottom** - Printed Media Page Margin Bottom Dimension
+* **pageMarginLeft** - Printed Media Page Margin Left Dimension
+* **pageMediaResource** - A fully qualified URL to your own stylesheet
+* **cssStyle** - CSS styles to place directly on the container element (to override computed styles)
+* **foStyle** - FO styles to place directly on the container element (to override cssStyles during XSL-FO rendering)
+* **render** - options to control the result of the rendering
+* **none** - Runs the client-side HTML+CSS and media styling without PDF rendering
+* **newwin** - [default on Firefox and Chrome] Embeds the rendered PDF into a new window. Client must enable pop-up's for this to work!
+* **download** - [default and only option on Internet Explorer and Safari as well as all mobile browsers] After PDF rendering the user is prompted to download and save the PDF result
+* **filename** - [default 'document'] Optionally used to name the downloaded file, the server will add the appropriate extension based on the mimetype of the requested document
+* **mimeType** - [default 'application/pdf'] Optionally used control the formatter to create the type of result:
 
-**application/pdf** for PDF documents
-**image/svg+xml** for SVG documents
-**image/png** for PNG page images
-**image/jpg** for JPG page images
-**image/gif** for GIF page images
-**application/vnd.ms-xpsdocument** for XPS documents You must ensure that you use only Truetype Fonts from the @cloudformatter server. XPS documents require Truetype fonts.
-**application/postscript** for Postscript documents
-**application/xep** for RenderX XEP (structure tree) documents which is an XML file
-**resolution** - [default '120'] Resolution for image output (applies to image mimetypes image/png, image/jpg and image/gif)
+* **application/pdf** for PDF documents
+* **image/svg+xml** for SVG documents
+* **image/png** for PNG page images
+* **image/jpg** for JPG page images
+* **image/gif** for GIF page images
+* **application/vnd.ms-xpsdocument** for XPS documents You must ensure that you use only Truetype Fonts from the @cloudformatter server. XPS documents require Truetype fonts.
+* **application/postscript** for Postscript documents
+* **application/xep** for RenderX XEP (structure tree) documents which is an XML file
+* **resolution** - [default '120'] Resolution for image output (applies to image mimetypes image/png, image/jpg and image/gif)
 
 *All options are optional and will defer to their default values when not specified*
 
