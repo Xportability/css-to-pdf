@@ -7,10 +7,38 @@ String.prototype.fromCamel = function(){
 
 var xepOnline = window.xepOnline || {};
 
+var current_mimetype = "application/pdf";
+
+function base64ToBuffer(base64) {
+  var binstr = atob(base64);
+  var buf = binaryStringToBuffer(binstr);
+  return buf;
+}
+
+window.Unibabel = {
+  utf8ToBinaryString: utf8ToBinaryString
+, utf8ToBuffer: utf8ToBuffer
+, utf8ToBase64: utf8ToBase64
+, binaryStringToUtf8: binaryStringToUtf8
+, bufferToUtf8: bufferToUtf8
+, base64ToUtf8: base64ToUtf8
+, bufferToBinaryString: bufferToBinaryString
+, bufferToBase64: bufferToBase64
+, binaryStringToBuffer: binaryStringToBuffer
+, base64ToBuffer: base64ToBuffer
+
+// compat
+, strToUtf8Arr: utf8ToBuffer
+, utf8ArrToStr: bufferToUtf8
+, arrToBase64: bufferToBase64
+, base64ToArr: base64ToBuffer
+};
+
 xepOnline.IE = function() {
 	var ua = window.navigator.userAgent;
 	var msie = ua.indexOf('MSIE ');
 	var trident = ua.indexOf('Trident/');
+	var edge = ua.indexOf('Edge/');
 
 	if (msie > 0) {
 		// IE 10 or older => return version number
@@ -18,10 +46,14 @@ xepOnline.IE = function() {
 	}
 
 	if (trident > 0) {
-		// IE 11 (or newer) => return version number
+		// IE 11 => return version number
 		var rv = ua.indexOf('rv:');
-		//return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
 		return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10) >= 11;
+	}
+	
+	if (edge > 0) {
+		// IE 12 => return version number
+		return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
 	}
 
 	// other browser
@@ -44,7 +76,8 @@ xepOnline.DEFAULTS = {
 
 // TODO: better media ignore method, maybe poke the css stylesheet to verify this is "the" bootstrap.css media to ignore
 xepOnline.MEDIA_IGNORE = [
-	"bootstrap.css"
+	"bootstrap.css",
+	"bootstrap.min.css"
 ]
 
 xepOnline.Formatter = {
@@ -189,16 +222,12 @@ xepOnline.Formatter = {
 	},
 	getFormTextData: function(PrintCopy) {
 		var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
-		//DEBUG
-		console.log(data);
 		var encoded = encodeURIComponent(data);
 		if(window.btoa) return btoa(encoded);
 		return encoded;
 	},
-	getFormData: function(PrintCopy, Name, MimeType, FileName) {
+	getFormData: function(PrintCopy, Name, MimeType, FileName, Resolution) {
 		var data = xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + PrintCopy;
-		//DEBUG
-		console.log(data);
 		var blob;
 		try
 		{
@@ -217,6 +246,7 @@ xepOnline.Formatter = {
 
 		obj.append(Name,blob,FileName);
 		obj.append('mimetype', MimeType);
+		obj.append('resolution', Resolution);
 		return obj;
 	},
 	togglePrintMediaStyle: function() {
@@ -235,15 +265,15 @@ xepOnline.Formatter = {
 				}
 			}
 
-			if(!document.styleSheets[x].cssRules === null || (document.styleSheets[x].href !== null && document.styleSheets[x].href.indexOf(location.host) === 0)) {
-				skipMedia = true;
-			}
-			if(skipMedia) continue;
 
-			var rules;			
 			// try catch - some browsers don't allow to read css stylesheets
+			var rules;			
 			try
 			{
+				if(!document.styleSheets[x].cssRules === null || (document.styleSheets[x].href !== null && document.styleSheets[x].href.indexOf(location.host) === 0)) {
+					skipMedia = true;
+				}
+				if(skipMedia) continue;
 				var rules=document.styleSheets[x].cssRules;
 			} catch(e) {}	
 
@@ -363,10 +393,19 @@ xepOnline.Formatter = {
 	},
 	xep_chandra_service: 'http://xep.cloudformatter.com/Chandra.svc/genpackage',
 	xep_chandra_service_AS_PDF: 'http://xep.cloudformatter.com/Chandra.svc/genfile',
+	xep_chandra_service_page_images: 'http://xep.cloudformatter.com/Chandra.svc/genpageimages',
 	entity_declaration:'<!DOCTYPE div [  <!ENTITY % winansi SYSTEM "http://xep.cloudformatter.com/doc/XSL/winansi.xml">  %winansi;]>',
 	xsl_stylesheet_declaration: '<?xml-stylesheet type="text/xsl" href="http://xep.cloudformatter.com/Doc/XSL/xeponline-fo-translate-2.xsl"?>',
 	src_type: { xml: 'text/xml'},
-	mime_type: { pdf: 'application/pdf', svg: 'image/svg+xml'},
+	mime_type: { 
+	   pdf: 'application/pdf', 
+	   svg: 'image/svg+xml', 
+	   xps:'application/vnd.ms-xpsdocument',
+	   ps: 'application/postscript',
+	   afp: 'application/afp',
+	   xep: 'application/xep',
+	   png: 'image/png'
+	},
 	/* options	
 		{
 			pageWidth: "8.5in", 				// reserved for the FO region-body (next 7)
@@ -391,8 +430,11 @@ xepOnline.Formatter = {
 		options = options || {};
 		options.render = (options.render === undefined) ? 'newwin' : options.render;
 		options.mimeType = (options.mimeType === undefined) ? xepOnline.Formatter.mime_type.pdf : options.mimeType;
+		options.filename = (options.filename === undefined) ? 'document' : options.filename;
+		options.resolution = (options.resolution === undefined) ? '120' : options.resolution;
+		
 		if(xepOnline.IE() || xepOnline.mobilecheck()) {
-			options.render = 'download';
+			options.render = (options.mimeType == 'image/svg+xml') ? options.render : 'download';
 		}
 
 		 var printcopy = '';
@@ -431,7 +473,7 @@ xepOnline.Formatter = {
 		if(options.render !== 'download') {
 			try 
 			{
-				blob = xepOnline.Formatter.getFormData(printcopy, 'xml', options.mimeType, 'document.xml');
+				blob = xepOnline.Formatter.getFormData(printcopy, 'xml', options.mimeType, 'document.xml', options.resolution);
 			} catch(e) 
 			{
 				// switch render to download if blob undefined
@@ -442,26 +484,51 @@ xepOnline.Formatter = {
 				}
 			}
 		}
-
+        // set temp mimetype for display
+        current_mimetype = options.mimeType;
 		if(options.render === 'download') {
 			jQuery('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'temp_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
 			jQuery('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + options.mimeType + '\'/>');
 			jQuery('#temp_post').append('<textarea name=\'xml\'>' + xepOnline.Formatter.getFormTextData(printcopy) + '</textarea>');
+			jQuery('#temp_post').append('<input type=\'text\' name=\'filename\' value=\'' + options.filename + '\'/>');
 			jQuery('#temp_post').submit();
 			jQuery('#temp_post').remove();
+// DO NOT USE. We are implementing SOAP-based server support also. It is functional but this server is an Azure server not active at this time.
+		} else if (options.render === 'soap') {	
+		    var productServiceUrl = 'http://52.8.13.8:6577/fairy'; 
+            var soapMessage =
+'<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" \
+    xmlns:fairy="http://52.8.13.8:6577/fairy"> \
+    <SOAP-ENV:Header/> \
+    <SOAP-ENV:Body> \
+        <fairy:format SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"> \
+            <in0>'+ xepOnline.Formatter.getBase() + '</in0> \
+            <in1>' + utf8ToBase64(xepOnline.Formatter.entity_declaration + xepOnline.Formatter.xsl_stylesheet_declaration + printcopy) + '</in1> \
+        </fairy:format> \
+    </SOAP-ENV:Body> \
+</SOAP-ENV:Envelope>';
+            jQuery.ajax({
+            url: productServiceUrl,
+            type: "POST",
+            dataType: "xml",
+            data: soapMessage,
+            complete: xepOnline.Formatter.__soapBackSuccess,
+            contentType: "text/xml; charset=\"UTF-8\""
+            });
 		} else {
 			jQuery.ajax({
 				type: "POST",
-				url: xepOnline.Formatter.xep_chandra_service,
+				url: current_mimetype == "image/png" || current_mimetype == "image/jpg" || current_mimetype == "image/gif" ? xepOnline.Formatter.xep_chandra_service_page_images : xepOnline.Formatter.xep_chandra_service,
 				processData: false,
 				contentType: false,
 				data: blob,
-				success: xepOnline.Formatter.__postBackSuccess,
+				success: current_mimetype == "image/png" || current_mimetype == "image/jpg" || current_mimetype == "image/gif" ? xepOnline.Formatter.__processImages : xepOnline.Formatter.__postBackSuccess,
 				error: xepOnline.Formatter.__postBackFailure
 			});
 		}
 		return false; 
 	},	
+	
 	Format: function(ElementID, options) {
 		var items;
 		if(jQuery.isArray(ElementID)) {
@@ -483,9 +550,8 @@ xepOnline.Formatter = {
 		jQuery(xepOnline.Formatter.__container).remove();
 		xepOnline.Formatter.togglePrintMediaStyle();
 	},
-	__postBackSuccess: function(Response) {
-		var base64PDF = jQuery(Response).find("Result").text();
-
+	__soapBackSuccess: function(xmlHttpRequest, status) {
+		var base64PDF = jQuery(xmlHttpRequest.responseXML).find('formatReturn').text();
 		var objbuilder = '';
 		objbuilder += ('<object width="100%" height="100%" data="data:application/pdf;base64,');
 		objbuilder += (base64PDF);
@@ -508,6 +574,85 @@ xepOnline.Formatter = {
 			win.document.write('</body></html>');
 			layer = jQuery(win.document);
 		}
+	},
+	__postBackSuccess: function(Response) {
+		var base64 = jQuery(Response).find("Result").text();
+		
+		if (current_mimetype == 'image/svg+xml'){
+		  if(jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true'){
+		        var parser = new DOMParser();
+                var dom = parser.parseFromString(bufferToBinaryString(base64ToBuffer(base64)).replace('ï»¿',''), "text/xml");
+                jQuery(xepOnline.Formatter.__elm).html('');
+                document.getElementById(jQuery(xepOnline.Formatter.__elm).attr('id')).appendChild(dom.documentElement);
+		  }
+		  else{
+		      var win = window.open("","_blank","titlebar=yes");
+			  win.document.title = "XEPOnline Result";
+			  win.document.write('<html><head>');
+			  jQuery.each(jQuery("link[href*='googleapis']"),function(index,value){
+			      win.document.write(value.outerHTML);
+			  });
+			  win.document.write('</head><body height="100%"><div id="target" style="height:100%;overflow-y:auto">');
+			  win.document.write('</div></body></html>');
+			  var parser = new DOMParser();
+              var dom = parser.parseFromString(bufferToBinaryString(base64ToBuffer(base64)).replace('ï»¿',''), "text/xml");
+              win.document.getElementById('target').appendChild(dom.documentElement);
+              layer = jQuery(win.document);
+		  }
+		}
+		else{
+    		var objbuilder = '';
+    		objbuilder += ('<object width="100%"');
+    	    objbuilder += (' height="100%" ');
+      		objbuilder += ('data="data:');
+      		objbuilder += (current_mimetype);
+      		objbuilder += (';base64,');
+      		objbuilder += (base64);
+      		objbuilder += ('" type="');
+      		objbuilder += (current_mimetype)
+      		objbuilder += ('" class="internal">');
+      		objbuilder += ('<embed src="data:');
+      		objbuilder += (current_mimetype);
+      		objbuilder += (';base64,');
+      		objbuilder += (base64);
+      		objbuilder += ('" type="');
+      		objbuilder += (current_mimetype);
+      		objbuilder += ('" />');
+      		objbuilder += ('</object>');
+		    if(jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true'){
+		          jQuery(xepOnline.Formatter.__elm).html(objbuilder);
+			      jQuery(xepOnline.Formatter.__elm).css({'height': xepOnline.DEFAULTS.pageHeight});
+		    }
+		    else {
+		         var win = window.open("","_blank","titlebar=yes");
+			     win.document.title = "XEPOnline Result";
+			     win.document.write('<html><head>');
+			     win.document.write('</head><body height="100%"><div id="target" style="height:100%;overflow-y:auto">');
+			     win.document.write(objbuilder);
+			     win.document.write('</div></body></html>');
+			     layer = jQuery(win.document);
+		    }
+		}
+	},
+	__processImages: function(Response) {
+	    var Pages = jQuery(Response).find("Pages").children();
+	    
+	     if(jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true'){
+	         jQuery(xepOnline.Formatter.__elm).html('');
+             jQuery.each(Pages,function(index,value){
+			     jQuery(xepOnline.Formatter.__elm).append('<img style="border:1px solid black" height="100%" src="data:image/png;base64,' + jQuery(value).text() + '"/>');
+			 });
+	     }
+	     else {
+                 var win = window.open("","_blank","titlebar=yes");
+			     win.document.title = "XEPOnline Result";
+			     win.document.write('<html><head>');
+			     win.document.write('</head><body height="100%"><div id="target" style="height:100%;overflow-y:auto">');
+			     jQuery.each(Pages,function(index,value){
+			         win.document.write('<img style="border:1px solid black" src="data:' + current_mimetype + ';base64,' + jQuery(value).text() + '"/>');
+			     });
+			     win.document.write('</div></body></html>');	         
+	     }
 	},
 	__postBackFailure: function (request, status, error){
 		alert('Woops, an exception occurred.  Please try again.');
