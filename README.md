@@ -51,9 +51,9 @@ Example: Force the PDF to download rather than embedded in a new window:
 * **cssStyle** - CSS styles to place directly on the container element (to override computed styles)
 * **foStyle** - FO styles to place directly on the container element (to override cssStyles during XSL-FO rendering)
 * **render** - options to control the result of the rendering
-  * **none** - Runs the client-side HTML+CSS and media styling without PDF rendering
-  * **newwin** - [default on Firefox and Chrome] Embeds the rendered PDF into a new window. Client must enable pop-up's for this to work!
-  * **download** - [default and only option on Internet Explorer and Safari as well as all mobile browsers] After PDF rendering the user is prompted to download and save the PDF result
+  * **none** - Runs the client-side HTML+CSS and media styling without document rendering
+  * **newwin** - [default on Firefox and Chrome] Embeds the rendered document into a new window. Client must enable pop-up's for this to work!
+  * **download** - [default and only option on Internet Explorer and Safari as well as all mobile browsers] After document rendering the user is prompted to download and save the document result
 * **filename** - [default 'document'] Optionally used to name the downloaded file, the server will add the appropriate extension based on the mimetype of the requested document
 * **mimeType** - [default 'application/pdf'] Optionally used control the formatter to create the type of result:
   * **application/pdf** for PDF documents
