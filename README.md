@@ -63,8 +63,8 @@ Example: Force the PDF to download rather than embedded in a new window:
   * **image/jpg** for JPG page images
   * **image/gif** for GIF page images
   * **application/vnd.ms-xpsdocument** for XPS documents You must ensure that you use only Truetype Fonts from the @cloudformatter server. XPS documents require Truetype fonts.
-* **application/postscript** for Postscript documents
-* **application/xep** for RenderX XEP (structure tree) documents which is an XML file
+  * **application/postscript** for Postscript documents
+  * **application/xep** for RenderX XEP (structure tree) documents which is an XML file
 * **resolution** - [default '120'] Resolution for image output (applies to image mimetypes image/png, image/jpg and image/gif)
 
 *All options are optional and will defer to their default values when not specified*
