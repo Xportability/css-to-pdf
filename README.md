@@ -6,7 +6,10 @@ Please visit the complete demonstration website at http://www.cloudformatter.com
 
 The basic method is to include a print button in your website with a click handler that calls the xepOnline.Formatter method "Format". The "Format" method takes a single element by ID or an array of element IDs. The resulting PDF is a single set of pages for each element ID (and children). PDF is produced from a hosted PDF rendering service. PDF is returned to the client browser as either an embeddable PDF or as a download. Certain features (like embedding PDFs) are not available on all browsers. Safari and Internet Explorer only support download. Chrome and Firefox support both download or embed.
 
-All HTML, CSS, and CSS media styling will be applied to the print selection(s) including print media CSS rules. Note: some framework's1 do have undesirable print media rules, therefore we have chosen to eliminate these by default2.
+All HTML, CSS, and CSS media styling will be applied to the print selection(s) including print media CSS rules. Note: some framework's do have undesirable print media rules, therefore we have chosen to eliminate these by default.
+
+## Get jQuery
+Be sure to include the jQuery Javascript library.
 
 ## Go get it:
 
