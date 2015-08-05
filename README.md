@@ -31,25 +31,25 @@ Where "Usage" is the ID of the element to print.
 
 A number of options can be passed to achieve various effects on the print output, including page media sizing and margins, as well as instruct the rendering engine to return an embedded PDF in a new window or a downloadable PDF. All the options are described below.
 
-Example: For A4 letter size (216mm x 279mm) output, one would write the "Format" as:
+#### Example: For A4 letter size (216mm x 279mm) output, one would write the "Format" as:
 
     <a href="#" onclick="return xepOnline.Formatter.Format('Usage',
                 {pageWidth:'216mm', pageHeight:'279mm'});">
         <img src="button-print.png">
     </a>
-Example: Force the PDF to download rather than embedded in a new window:
+#### Example: Force the PDF to download rather than embedded in a new window:
 
     <a href="#" onclick="return xepOnline.Formatter.Format('Usage',{render:'download'});">
         <img src="button-print.png">
     </a>
 
-Example: Setting some default CSS options for the <div> in case you wish to override them
+#### Example: Setting some default CSS options for the <div> in case you wish to override them
 
     <a href="#" onclick="return xepOnline.Formatter.Format('testDIV',{render:'download', 
                 cssStyle:[{fontSize:'30px'},{fontWeight:'bold'}]});">
          <img src="button-print.png"/>
     </a>
-Example: Adding namespaces used in the document for specialized attributes
+#### Example: Adding namespaces used in the document for specialized attributes
 
     <a href="#" onclick="return xepOnline.Formatter.Format('testDIV',{render:'download', 
                 namespaces:['xmlns:ng=&quot;http://www.foo.net&quot;']});">
