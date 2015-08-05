@@ -38,6 +38,19 @@ Example: Force the PDF to download rather than embedded in a new window:
         <img src="button-print.png">
     </a>
 
+Example: Setting some default CSS options for the <div> in case you wish to override them
+
+    <a href="#" onclick="return xepOnline.Formatter.Format('testDIV',{render:'download', 
+                cssStyle:[{fontSize:'30px'},{fontWeight:'bold'}]});">
+         <img src="button-print.png"/>
+    </a>
+Example: Adding namespaces used in the document for specialized attributes
+
+    <a href="#" onclick="return xepOnline.Formatter.Format('testDIV',{render:'download', 
+                namespaces:['xmlns:ng=&quot;http://www.foo.net&quot;']});">
+         <img src="button-print.png"/>
+    </a>
+
 # Options
 
 * **pageWidth** - [default 8.5in] Printed Media Page Width
@@ -48,13 +61,15 @@ Example: Force the PDF to download rather than embedded in a new window:
 * **pageMarginBottom** - Printed Media Page Margin Bottom Dimension
 * **pageMarginLeft** - Printed Media Page Margin Left Dimension
 * **pageMediaResource** - A fully qualified URL to your own stylesheet
-* **cssStyle** - CSS styles to place directly on the container element (to override computed styles)
-* **foStyle** - FO styles to place directly on the container element (to override cssStyles during XSL-FO rendering)
+* **namespaces** - an array of namespace strings to be added to the document. You need to do this if you are using any specialized library that would add namespaces to attributes. These are for the most part ignored at the backend transformation, but it would be an error if not including them.
+* **cssStyle** - CSS styles to place directly on the container element (to override computed styles) as an array of objects whose key/value is the camel case CSS style name and a string value
+* **foStyle** - FO styles to place directly on the container element (to override cssStyles during XSL-FO rendering) as an array of objects whose key/value is the camel case CSS style name and a string value
 * **render** - options to control the result of the rendering
   * **none** - Runs the client-side HTML+CSS and media styling without document rendering
   * **embed** - The resulting document is embed into (and replaces) the same &lt;div&gt; as the request
   * **newwin** - [default on Firefox and Chrome] Embeds the rendered document into a new window. Client must enable pop-up's for this to work!
   * **download** - [default and only option on Internet Explorer and Safari as well as all mobile browsers] After document rendering the user is prompted to download and save the document result
+* **srctype** - [default 'xml'] Optionally used to control what is formatted. If you set this to the string 'svg', the first svg element in the containing div will be formatted alone.
 * **filename** - [default 'document'] Optionally used to name the downloaded file, the server will add the appropriate extension based on the mimetype of the requested document
 * **mimeType** - [default 'application/pdf'] Optionally used control the formatter to create the type of result:
   * **application/pdf** for PDF documents
