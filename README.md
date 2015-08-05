@@ -1,5 +1,7 @@
 css2pdf is a simple to use Javascript for CSS to PDF rendering that can easily be plugged-in to your website.
 
+Please visit the complete demonstration website at http://www.cloudformatter.com/css2pdf
+
 # Instructions
 
 The basic method is to include a print button in your website with a click handler that calls the xepOnline.Formatter method "Format". The "Format" method takes a single element by ID or an array of element IDs. The resulting PDF is a single set of pages for each element ID (and children). PDF is produced from a hosted PDF rendering service. PDF is returned to the client browser as either an embeddable PDF or as a download. Certain features (like embedding PDFs) are not available on all browsers. Safari and Internet Explorer only support download. Chrome and Firefox support both download or embed.
