@@ -43,7 +43,7 @@ A number of options can be passed to achieve various effects on the print output
         <img src="button-print.png">
     </a>
 
-#### Example: Setting some default CSS options for the <div> in case you wish to override them
+#### Example: Setting some default CSS options for the &lt;div&gt; in case you wish to override them
 
     <a href="#" onclick="return xepOnline.Formatter.Format('testDIV',{render:'download', 
                 cssStyle:[{fontSize:'30px'},{fontWeight:'bold'}]});">
