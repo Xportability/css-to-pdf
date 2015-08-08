@@ -623,7 +623,11 @@ xepOnline.Formatter = {
 			printcopy = xepOnline.Formatter.cleanSVGDeclarations(printcopy);
 		}
 		//Kevin hack for now, stuff the whole thing in a document div
-		printcopy = '<div base="' + xepOnline.Formatter.getBase() + '" class="xeponline-document">' + printcopy + '</div>';
+		var nss = "";
+		jQuery.each(options.namespaces || [], function(objkey, objvalue) {
+                	nss += objvalue + ' ';
+        	});
+		printcopy = '<div base="' + xepOnline.Formatter.getBase() + '" class="xeponline-document">' + nss + printcopy + '</div>';
 
 		var blob;
 		if(options.render !== 'download') {
@@ -760,7 +764,12 @@ xepOnline.Formatter = {
     		var objbuilder = '';
     		objbuilder += ('<object width="100%"');
     	    	objbuilder += (' height="');
-    	    	objbuilder += (current_height);
+    	    	if(jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true'){
+    	       		objbuilder += (current_height);
+    	    	}
+    	    	else {
+    	       		objbuilder += ('100%'); 
+    	    	}
       		objbuilder += ('" data="data:');
       		objbuilder += (current_mimetype);
       		objbuilder += (';base64,');
