@@ -226,7 +226,7 @@ xepOnline.MEDIA_IGNORE = [
 ]
 
 xepOnline.Formatter = {
-	clean_tags: ['img', 'hr', 'br', 'input', 'col ', 'embed', 'param', 'content'],
+	clean_tags: ['img', 'hr', 'br', 'input', 'col ', 'embed', 'param', 'source'],
 	fo_attributes_root: [
 			'color', 
 			'height',
