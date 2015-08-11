@@ -258,7 +258,8 @@ xepOnline.Formatter = {
 			'tableLayout', 
 			'textAlign', 'textAnchor','textDecoration', 'textIndent', 'textTransform', 'textShadow',
 			'verticalAlign',
-			'widows', 'width'],            
+			'widows', 'width',
+			'position','top','left','bottom','right'],            
 	getRealStyle: function(elm, attributes) {
 		var returnObj = {};
 		var computed = getComputedStyle(elm);
