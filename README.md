@@ -18,6 +18,14 @@ You can either just include the one from this website or download.
 ## Include the library:
 
     <script src="xepOnline.jqPlugin.js"></script>
+    
+## If you are calling the library from a secure site:
+
+You can either change the external references in the Javascript from http: to https: or override their values in your own Javascript.  You would change (or override) to these values:
+
+    xep_chandra_service: 'https://xep.cloudformatter.com/Chandra.svc/genpackage',
+	xep_chandra_service_AS_PDF: 'https://xep.cloudformatter.com/Chandra.svc/genfile',
+    xep_chandra_service_page_images: 'https://xep.cloudformatter.com/Chandra.svc/genpageimages',
 
 ## Use it:
 
