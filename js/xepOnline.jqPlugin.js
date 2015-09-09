@@ -289,6 +289,29 @@ xepOnline.Formatter = {
 			}
 		}
 	},
+	replaceCanvas: function(dest) {
+	    jQuery(dest).find('canvas').each(function(index) {
+			var canvas = this;
+			var src_canvas = jQuery(jQuery(xepOnline.Formatter.__elm)[0]).find('canvas')[index];
+			jQuery('<img src="' + src_canvas.toDataURL() +'"/>').insertAfter(canvas);
+		});
+	},
+	embedLocalImages: function(dest) {
+	    jQuery(dest).find('img').each(function(index) {
+			var img = this;
+			var imageUrl = img.src;
+			if (imageUrl.indexOf(xepOnline.Formatter.getBase()) != -1){
+			     var canvas = document.createElement('canvas');
+	             	     var ctx = canvas.getContext('2d');
+		             canvas.height = img.height;
+		             canvas.width = img.width;
+	  	             ctx.drawImage(img,0,0, img.width, img.height);
+	  	             var dataURL = canvas.toDataURL();
+	  	             jQuery(img).attr('src', dataURL);
+                             canvas = null;
+                        }
+		});
+	},
 	computeTableCols: function(dest) {
 		jQuery('table').each(function() {
 			var table = this;
@@ -363,8 +386,14 @@ xepOnline.Formatter = {
 
 			}
 		});
-		// table columns
+		// fix table columns
 		xepOnline.Formatter.computeTableCols(elm);
+		// embed canvas
+		xepOnline.Formatter.replaceCanvas(elm);
+		// embed local image if set in options
+		if (options.embedLocalImages == 'true') {
+		    xepOnline.Formatter.embedLocalImages(elm);
+		}
 	},
 	getFormTextData: function(PrintCopy) {
 		var data = xepOnline.Formatter.entity_declaration + current_stylesheet + PrintCopy;
