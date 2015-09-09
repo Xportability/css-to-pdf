@@ -24,7 +24,7 @@ You can either just include the one from this website or download.
 You can either change the external references in the Javascript from http: to https: or override their values in your own Javascript.  You would change (or override) to these values:
 
     xep_chandra_service: 'https://xep.cloudformatter.com/Chandra.svc/genpackage',
-	xep_chandra_service_AS_PDF: 'https://xep.cloudformatter.com/Chandra.svc/genfile',
+    xep_chandra_service_AS_PDF: 'https://xep.cloudformatter.com/Chandra.svc/genfile',
     xep_chandra_service_page_images: 'https://xep.cloudformatter.com/Chandra.svc/genpageimages',
 
 ## Use it:
@@ -66,6 +66,7 @@ A number of options can be passed to achieve various effects on the print output
 
 # Options
 
+* **embedLocalImages** - [default 'false'] - set this to true if you are testing with locally hosted images. While it will not solve all your issues, it will embed any locally referenced <img> as base64 encoded before sending to the backend. This does not embed images you use as **background-image** or by other means like through CSS, but it will embed locally referenced images you have through <img> tags.
 * **pageWidth** - [default 8.5in] Printed Media Page Width
 * **pageHeight** - [default 11in] Printed Media Page Height
 * **pageMargin** - [default 0.5in] Printed Media Page Margin Dimensions (short-hand)
