@@ -178,7 +178,6 @@ window.Unibabel = {
 , base64ToArr: base64ToBuffer
 };
 
-
 xepOnline.IE = function() {
 	var ua = window.navigator.userAgent;
 	var msie = ua.indexOf('MSIE ');
@@ -226,7 +225,7 @@ xepOnline.MEDIA_IGNORE = [
 ]
 
 xepOnline.Formatter = {
-	clean_tags: ['img', 'hr', 'br', 'input', 'col ', 'embed', 'param', 'source'],
+	clean_tags: ['img', 'hr', 'br', 'input', 'col ', 'embed', 'param', 'source', 'link'],
 	fo_attributes_root: [
 			'color', 
 			'height',
@@ -302,25 +301,25 @@ xepOnline.Formatter = {
 			var imageUrl = img.src;
 			if (imageUrl.indexOf(xepOnline.Formatter.getBase()) != -1){
 			     var canvas = document.createElement('canvas');
-	             	     var ctx = canvas.getContext('2d');
-		             canvas.height = img.height;
-		             canvas.width = img.width;
-	  	             ctx.drawImage(img,0,0, img.width, img.height);
-	  	             var dataURL = canvas.toDataURL();
-	  	             jQuery(img).attr('src', dataURL);
-                             canvas = null;
-                        }
+	             var ctx = canvas.getContext('2d');
+		         canvas.height = img.height;
+		         canvas.width = img.width;
+	  	         ctx.drawImage(img,0,0, img.width, img.height);
+	  	         var dataURL = canvas.toDataURL();
+	  	         jQuery(img).attr('src', dataURL);
+                canvas = null;
+            }
 		});
 	},
 	computeTableCols: function(dest) {
-		jQuery('table').each(function() {
+		jQuery(dest).find('table').each(function() {
 			var table = this;
 			jQuery(table).find('col,colgroup').each(function() {
 				jQuery(this).attr('xeponline-drop-me',true);
 			});
 
 				var cols = 0;
-				jQuery(jQuery.find('td,th',jQuery('tr',table)[0])).each(function(td) { cols += Number((Number(jQuery(td).attr('colspan'))) ? (jQuery(td).attr('colspan')): 1); })
+				jQuery(jQuery.find('dest td,th',jQuery('tr',table)[0])).each(function(td) { cols += Number((Number(jQuery(td).attr('colspan'))) ? (jQuery(td).attr('colspan')): 1); })
 				var tbody = jQuery('<tbody>');
 				var tr = jQuery('<tr>');
 				jQuery(tbody).append(tr);
@@ -358,7 +357,7 @@ xepOnline.Formatter = {
 		}
 		return result;
 	},
-	flattenStyle: function(elm) {
+	flattenStyle: function(elm, options) {
 		// parent
 		xepOnline.Formatter.copyComputedStyle(elm, elm, undefined, xepOnline.Formatter.fo_attributes_root);
 		// children
@@ -388,7 +387,7 @@ xepOnline.Formatter = {
 		});
 		// fix table columns
 		xepOnline.Formatter.computeTableCols(elm);
-		// embed canvas
+		// imbed canvas
 		xepOnline.Formatter.replaceCanvas(elm);
 		// embed local image if set in options
 		if (options.embedLocalImages == 'true') {
@@ -637,7 +636,7 @@ xepOnline.Formatter = {
 			jQuery(xepOnline.Formatter.__clone).appendTo(jQuery(xepOnline.Formatter.__container).children(1));		
 
 		   xepOnline.Formatter.togglePrintMediaStyle();
-		   xepOnline.Formatter.flattenStyle(jQuery(xepOnline.Formatter.__container)[0]);
+		   xepOnline.Formatter.flattenStyle(jQuery(xepOnline.Formatter.__container)[0], options);
 		   printcopy = printcopy + xepOnline.Formatter.cleanTags(jQuery(xepOnline.Formatter.__container)[0].outerHTML);
 		   xepOnline.Formatter.Clear();
 		});
@@ -655,9 +654,9 @@ xepOnline.Formatter = {
 		//Kevin hack for now, stuff the whole thing in a document div
 		var nss = "";
 		jQuery.each(options.namespaces || [], function(objkey, objvalue) {
-                	nss += objvalue + ' ';
-        	});
-		printcopy = '<div base="' + xepOnline.Formatter.getBase() + '" class="xeponline-document">' + nss + printcopy + '</div>';
+                nss += objvalue + ' ';
+        });
+		printcopy = '<div base="' + xepOnline.Formatter.getBase() + '" class="xeponline-document" ' + nss + '>' + printcopy + '</div>';
 
 		var blob;
 		if(options.render !== 'download') {
@@ -793,13 +792,13 @@ xepOnline.Formatter = {
 		else{
     		var objbuilder = '';
     		objbuilder += ('<object width="100%"');
-    	    	objbuilder += (' height="');
-    	    	if(jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true'){
-    	       		objbuilder += (current_height);
-    	    	}
-    	    	else {
-    	       		objbuilder += ('100%'); 
-    	    	}
+    	    objbuilder += (' height="');
+    	    if(jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true'){
+    	       objbuilder += (current_height);
+    	    }
+    	    else{
+    	       objbuilder += ('100%'); 
+    	    }
       		objbuilder += ('" data="data:');
       		objbuilder += (current_mimetype);
       		objbuilder += (';base64,');
