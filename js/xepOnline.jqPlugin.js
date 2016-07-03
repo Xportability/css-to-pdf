@@ -1,3 +1,4 @@
+
 String.prototype.toCamel = function(){
 	return this.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace('-','');});
 };
@@ -288,6 +289,13 @@ xepOnline.Formatter = {
 			}
 		}
 	},
+	setSVGHeightWidth: function(dest) {
+	    jQuery(dest).find('svg').each(function(index) {
+			var svg = jQuery(this);
+			svg.attr('height',svg.outerHeight());
+            svg.attr('width',svg.outerWidth());
+		});
+	},
 	replaceCanvas: function(dest) {
 	    jQuery(dest).find('canvas').each(function(index) {
 			var canvas = this;
@@ -387,6 +395,8 @@ xepOnline.Formatter = {
 		});
 		// fix table columns
 		xepOnline.Formatter.computeTableCols(elm);
+		// check SVG width/height
+		xepOnline.Formatter.setSVGHeightWidth(elm);
 		// imbed canvas
 		xepOnline.Formatter.replaceCanvas(elm);
 		// embed local image if set in options
@@ -481,7 +491,7 @@ xepOnline.Formatter = {
 		html += '</style>\n';
 		jQuery('head').append(html);
 	},
-	getFOContainer: function(options) {
+	getFOContainer: function(elm, options) {
 		options 			= options || {};
 		options.pageWidth 	= options.pageWidth || xepOnline.DEFAULTS.pageWidth;
 		options.pageHeight 	= options.pageHeight || xepOnline.DEFAULTS.pageHeight;
@@ -489,6 +499,11 @@ xepOnline.Formatter = {
 
 		var container = jQuery('<div class=\'xeponline-container\'></div>');
 		var margincontainer = jQuery('<div class=\'margin-container\'></div>');
+		if (options.srctype == 'svg'){
+		    var svgcontainer = jQuery('<div class=\'svg-container\' width=' + jQuery(elm).width() + ' height=' + jQuery(elm).height() + '></div>');
+		    margincontainer.append(svgcontainer);
+		}
+
 		container.append(margincontainer);
 		var stylebuilder = '';
 		var stylebuildermargin = '';
@@ -630,7 +645,7 @@ xepOnline.Formatter = {
 		   }
 
 		   xepOnline.Formatter.__clone = jQuery(xepOnline.Formatter.__elm)[0].outerHTML;
-		   xepOnline.Formatter.__container = xepOnline.Formatter.getFOContainer(options);
+		   xepOnline.Formatter.__container = xepOnline.Formatter.getFOContainer(xepOnline.Formatter.__elm, options);
 
 			jQuery('#' + ElementID).after(jQuery(xepOnline.Formatter.__container));
 			jQuery(xepOnline.Formatter.__clone).appendTo(jQuery(xepOnline.Formatter.__container).children(1));		
@@ -677,11 +692,12 @@ xepOnline.Formatter = {
         current_mimetype = options.mimeType;
 		if(options.render === 'download') {
 			jQuery('body').append('<form style="width:0px; height:0px; overflow:hidden" enctype=\'multipart/form-data\' id=\'temp_post\' method=\'POST\' action=\'' + xepOnline.Formatter.xep_chandra_service_AS_PDF + '\'></form>');		
-			jQuery('#temp_post').append('<input type=\'text\' name=\'mimetype\' value=\'' + options.mimeType + '\'/>');
-			jQuery('#temp_post').append('<textarea name=\'xml\'>' + xepOnline.Formatter.getFormTextData(printcopy) + '</textarea>');
-			jQuery('#temp_post').append('<input type=\'text\' name=\'filename\' value=\'' + options.filename + '\'/>');
+			jQuery('#temp_post').append('<input type=\'hidden\' name=\'mimetype\' value=\'' + options.mimeType + '\'/>');
+			jQuery('#temp_post').append('<input type=\'hidden\' name=\'filename\' value=\'' + options.filename + '\'/>');
+			jQuery('#temp_post').append('<input type=\'hidden\' name=\'xml\' value=\'' + xepOnline.Formatter.getFormTextData(printcopy) + '\'/>');
 			jQuery('#temp_post').submit();
 			jQuery('#temp_post').remove();
+			jQuery(document).trigger( "xepOnlineStatus", ["Finished"]);
 // DO NOT USE. We are implementing SOAP-based server support also. It is functional but this server is an Azure server not active at this time.
 		} else if (options.render === 'soap') {	
 		    var productServiceUrl = 'http://52.8.13.8:6577/fairy'; 
@@ -719,6 +735,7 @@ xepOnline.Formatter = {
 	},	
 	
 	Format: function(ElementID, options) {
+	    jQuery(document).trigger( "xepOnlineStatus", ["Started"]);
 		var items;
 		if(jQuery.isArray(ElementID)) {
 			items = ElementID;
@@ -765,6 +782,7 @@ xepOnline.Formatter = {
 		}
 	},
 	__postBackSuccess: function(Response) {
+	    jQuery(document).trigger( "xepOnlineStatus", ["Finished"]);
 		var base64 = jQuery(Response).find("Result").text();
 		
 		if (current_mimetype == 'image/svg+xml'){
@@ -829,6 +847,7 @@ xepOnline.Formatter = {
 		}
 	},
 	__processImages: function(Response) {
+	    jQuery(document).trigger( "xepOnlineStatus", ["Finished"]);
 	    var Pages = jQuery(Response).find("Pages").children();
 	    
 	     if(jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true'){
@@ -849,8 +868,9 @@ xepOnline.Formatter = {
 	     }
 	},
 	__postBackFailure: function (request, status, error){
-	        var req = jQuery(request.responseText);
-	        var win = window.open("","_blank","titlebar=yes, width=800, height=500");
+	    jQuery(document).trigger( "xepOnlineStatus", ["Finished"]);
+	    var req = jQuery(request.responseText);
+	    var win = window.open("","_blank","titlebar=yes, width=800, height=500");
 		win.document.title = "XEPOnline Error";
 		win.document.write(request.responseText);
 	}
