@@ -303,6 +303,14 @@ xepOnline.Formatter = {
 			jQuery('<img src="' + src_canvas.toDataURL() +'"/>').insertAfter(canvas);
 		});
 	},
+	replacePseudoBefore: function(dest) {
+	    jQuery(dest).find('.glyphicon, .fa').each(function(index) {
+			var glyphspan = this;
+			var src_glyphspan = jQuery(jQuery(xepOnline.Formatter.__elm)[0]).find('.glyphicon, .fa')[index];
+			var before_content = getComputedStyle(src_glyphspan,':before').getPropertyValue('content')
+			jQuery(glyphspan).text(before_content.replace(/"/g ,''));
+		});
+	},
 	embedLocalImages: function(dest) {
 	    jQuery(dest).find('img').each(function(index) {
 			var img = this;
@@ -399,6 +407,8 @@ xepOnline.Formatter = {
 		xepOnline.Formatter.setSVGHeightWidth(elm);
 		// imbed canvas
 		xepOnline.Formatter.replaceCanvas(elm);
+		// Glyphicons
+		xepOnline.Formatter.replacePseudoBefore(elm);
 		// embed local image if set in options
 		if (options.embedLocalImages == 'true') {
 		    xepOnline.Formatter.embedLocalImages(elm);
