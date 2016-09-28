@@ -662,6 +662,9 @@ xepOnline.Formatter = {
 		if(options.render === 'embed') {
 			xepOnline.Formatter.__container.attr('data-xeponline-embed-pending', 'true');
 		}
+		if(options.render === 'base64') {
+			return utf8ToBase64(xepOnline.Formatter.entity_declaration + current_stylesheet + printcopy);
+		}	
 		// fix IE double xmlns declerations in SVG
 		if(xepOnline.IE()) {
 			printcopy = xepOnline.Formatter.cleanSVGDeclarations(printcopy);
