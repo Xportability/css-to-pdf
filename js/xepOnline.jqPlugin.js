@@ -867,7 +867,7 @@ xepOnline.Formatter = {
 		if (current_mimetype == 'image/svg+xml'){
 		  if(jQuery(xepOnline.Formatter.__container).attr('data-xeponline-embed-pending') === 'true'){
 		        var parser = new DOMParser();
-                var dom = parser.parseFromString(bufferToBinaryString(base64ToBuffer(base64)).replace('﻿',''), "text/xml");
+                var dom = parser.parseFromString(bufferToBinaryString(base64ToBuffer(base64)).replace('ï»¿',''), "text/xml");
                 jQuery(xepOnline.Formatter.__elm).html('');
                 document.getElementById(jQuery(xepOnline.Formatter.__elm).attr('id')).appendChild(dom.documentElement);
 		  }
@@ -881,7 +881,7 @@ xepOnline.Formatter = {
 			  win.document.write('</head><body height="100%"><div id="target" style="height:100%;overflow-y:auto">');
 			  win.document.write('</div></body></html>');
 			  var parser = new DOMParser();
-              var dom = parser.parseFromString(bufferToBinaryString(base64ToBuffer(base64)).replace('﻿',''), "text/xml");
+              var dom = parser.parseFromString(bufferToBinaryString(base64ToBuffer(base64)).replace('ï»¿',''), "text/xml");
               win.document.getElementById('target').appendChild(dom.documentElement);
               layer = jQuery(win.document);
 		  }
