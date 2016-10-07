@@ -260,17 +260,18 @@ xepOnline.Formatter = {
 			'verticalAlign',
 			'widows', 'width',
 			'position','top','left','bottom','right'],            
-	getRealStyle: function(elm, attributes) {
+	getRealStyle: function(elm, attributes, pseudo) {
 		var returnObj = {};
-		var computed = getComputedStyle(elm);
+		var computed = getComputedStyle(elm, pseudo);
 		for(var i=0; i<attributes.length; i++) {
 			returnObj[attributes[i]] = computed[attributes[i]];
 		}
 		return returnObj;
 	},
-	copyComputedStyle: function(elm, dest, parentStyle, attributes) {
+	copyComputedStyle: function(elm, dest, parentStyle, attributes, pseudo) {
 		parentStyle = parentStyle || {}; 
-		var s = xepOnline.Formatter.getRealStyle(elm, attributes);
+		var s = xepOnline.Formatter.getRealStyle(elm, attributes, pseudo);
+
 		for ( var i in s ) {
 			var currentCss = s[i];
 
@@ -303,12 +304,75 @@ xepOnline.Formatter = {
 			jQuery('<img src="' + src_canvas.toDataURL() +'"/>').insertAfter(canvas);
 		});
 	},
-	replacePseudoBefore: function(dest) {
-	    jQuery(dest).find('.glyphicon, .fa').each(function(index) {
-			var glyphspan = this;
-			var src_glyphspan = jQuery(jQuery(xepOnline.Formatter.__elm)[0]).find('.glyphicon, .fa')[index];
-			var before_content = getComputedStyle(src_glyphspan,':before').getPropertyValue('content')
-			jQuery(glyphspan).text(before_content.replace(/"/g ,''));
+    handlePseudoElem: function(dest) {
+	    jQuery(dest).find('*').each(function(index) {
+			var elem = this;
+			var before = getComputedStyle(elem, ':before');  
+			if(before.getPropertyValue('content').length > 0 && before.getPropertyValue('content') != "none"){
+			     var before_text = before.getPropertyValue('content').split('"');
+			     var in_image = false;
+			     var processed = false;
+			     var span_before = jQuery('<span>');
+			     var parentStyle = xepOnline.Formatter.getRealStyle(jQuery(elem).parent()[0], xepOnline.Formatter.fo_attributes, null);
+			     xepOnline.Formatter.copyComputedStyle(elem, span_before[0], parentStyle, xepOnline.Formatter.fo_attributes, ":before");	
+                 before_text.forEach(function (part){
+                     if (part == "")
+                        processed = true;       
+                     if (part.indexOf("url(") >= 0){
+                        in_image = true;
+                        processed = true;
+                     }
+                     if (part.indexOf("ttp://") >= 0 && in_image == true) {
+                         var img = jQuery('<img src="url(&quot;'+ part + '&quot;)">');
+			             jQuery(span_before).append(img);
+			             processed = true;
+                     }
+                     if (part.indexOf(")") >= 0 && in_image == true) {
+                        in_image= false;
+                        processed = true;
+                     }
+                     if (processed == false) {
+                        var textspan = jQuery('<span>');
+                        jQuery(textspan).text(part);
+                        jQuery(span_before).append(textspan);
+                     }
+                     processed = false;
+                 }); 
+                 jQuery(elem).prepend(span_before);
+            }
+            var after = getComputedStyle(elem, ':after');   
+			if(after.getPropertyValue('content').length > 0 && after.getPropertyValue('content') != "none"){
+			     var after_text = after.getPropertyValue('content').split('"');
+			     var in_image = false;
+			     var processed = false;
+			     var span_after = jQuery('<span>');
+			     var parentStyle = xepOnline.Formatter.getRealStyle(jQuery(elem).parent()[0], xepOnline.Formatter.fo_attributes, null);
+			     xepOnline.Formatter.copyComputedStyle(elem, span_after[0], parentStyle, xepOnline.Formatter.fo_attributes, ":after");	
+                 after_text.forEach(function (part){
+                     if (part == "")
+                        processed = true;       
+                     if (part.indexOf("url(") >= 0){
+                        in_image = true;
+                        processed = true;
+                     }
+                     if (part.indexOf("ttp://") >= 0 && in_image == true) {
+                         var img = jQuery('<img src="url(&quot;'+ part + '&quot;)">');
+			             jQuery(span_after).append(img);
+			             processed = true;
+                     }
+                     if (part.indexOf(")") >= 0 && in_image == true) {
+                        in_image= false;
+                        processed = true;
+                     }
+                     if (processed == false) {
+                        var textspan = jQuery('<span>');
+                        jQuery(textspan).text(part);
+                        jQuery(span_after).append(textspan);
+                     }
+                     processed = false;
+                 }); 
+                 jQuery(elem).append(span_after);
+            }
 		});
 	},
 	embedLocalImages: function(dest) {
@@ -375,7 +439,7 @@ xepOnline.Formatter = {
 	},
 	flattenStyle: function(elm, options) {
 		// parent
-		xepOnline.Formatter.copyComputedStyle(elm, elm, undefined, xepOnline.Formatter.fo_attributes_root);
+		xepOnline.Formatter.copyComputedStyle(elm, elm, undefined, xepOnline.Formatter.fo_attributes_root, null);
 		// children
 		jQuery(elm).find('*').each(function(index, elm2) {
 			switch(elm2.tagName) {
@@ -395,21 +459,22 @@ xepOnline.Formatter = {
 				// ignore these tags
 				break;
 				default:
-					var parentStyle = xepOnline.Formatter.getRealStyle(jQuery(elm2).parent()[0], xepOnline.Formatter.fo_attributes);
-					xepOnline.Formatter.copyComputedStyle(elm2, elm2, parentStyle, xepOnline.Formatter.fo_attributes);				
+					var parentStyle = xepOnline.Formatter.getRealStyle(jQuery(elm2).parent()[0], xepOnline.Formatter.fo_attributes, null);
+					xepOnline.Formatter.copyComputedStyle(elm2, elm2, parentStyle, xepOnline.Formatter.fo_attributes, null);				
 				break;
 
 			}
 		});
-		// fix table columns
+		// Fix table columns
 		xepOnline.Formatter.computeTableCols(elm);
-		// check SVG width/height
+		// Check SVG width/height
 		xepOnline.Formatter.setSVGHeightWidth(elm);
-		// imbed canvas
+		// Embed canvas
 		xepOnline.Formatter.replaceCanvas(elm);
-		// Glyphicons
-		xepOnline.Formatter.replacePseudoBefore(elm);
-		// embed local image if set in options
+		// Pseudo Elements (currently only handles :before and :after and can be turned off if needed)
+		if (options.processPseudoElem == 'true')
+		    xepOnline.Formatter.handlePseudoElem(elm);
+		// Embed local image if set in options
 		if (options.embedLocalImages == 'true') {
 		    xepOnline.Formatter.embedLocalImages(elm);
 		}
@@ -636,6 +701,7 @@ xepOnline.Formatter = {
 		options.mimeType = (options.mimeType === undefined) ? xepOnline.Formatter.mime_type.pdf : options.mimeType;
 		options.filename = (options.filename === undefined) ? 'document' : options.filename;
 		options.resolution = (options.resolution === undefined) ? '120' : options.resolution;
+		options.processPseudoElem = (options.processPseudoElem === undefined) ? 'true' : options.processPseudoElem;
 		
 		//Record the height of the target
 		current_height = jQuery('#' + ElementIDs[0]).height();
