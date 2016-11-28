@@ -1,0 +1,12 @@
+{
+  "name": "css-to-pdf",
+  "version": "1.0.0",
+  "description": "css2pdf is a simple to use Javascript for CSS to PDF rendering that can easily be plugged-in to your website.",
+  "main": "js/xepOnline.jqPlugin.js",
+  "repository": {
+    "type": "git",
+    "url": "Xportability/css-to-pdf"
+  },
+  "author": "Xportability",
+  "license": "UNLICENSED"
+}
