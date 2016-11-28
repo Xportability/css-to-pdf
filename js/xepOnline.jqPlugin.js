@@ -50,7 +50,8 @@
     }
 
 })(function() {
-    
+    "use strict";
+
 String.prototype.toCamel = function(){
 	return this.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace('-','');});
 };
@@ -747,6 +748,7 @@ xepOnline.Formatter = {
 					}			
 		}
 	*/
+    layer: false,
 	__format: function(ElementIDs, options) {
 		options = options || {};
 		options.render = (options.render === undefined) ? 'newwin' : options.render;
@@ -909,7 +911,7 @@ xepOnline.Formatter = {
 			win.document.write('<html><body>');
 			win.document.write(objbuilder);
 			win.document.write('</body></html>');
-			layer = jQuery(win.document);
+			xepOnline.Formatter.layer = jQuery(win.document);
 		}
 	},
 	__postBackSuccess: function(Response) {
@@ -935,7 +937,7 @@ xepOnline.Formatter = {
 			  var parser = new DOMParser();
               var dom = parser.parseFromString(bufferToBinaryString(base64ToBuffer(base64)).replace('ï»¿',''), "text/xml");
               win.document.getElementById('target').appendChild(dom.documentElement);
-              layer = jQuery(win.document);
+              xepOnline.Formatter.layer = jQuery(win.document);
 		  }
 		}
 		else{
@@ -973,7 +975,7 @@ xepOnline.Formatter = {
 			     win.document.write('</head><body height="100%"><div id="target" style="height:100%;overflow-y:auto">');
 			     win.document.write(objbuilder);
 			     win.document.write('</div></body></html>');
-			     layer = jQuery(win.document);
+			     xepOnline.Formatter.layer = jQuery(win.document);
 		    }
 		}
 	},
