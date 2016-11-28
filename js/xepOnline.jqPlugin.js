@@ -1,4 +1,56 @@
+// Logic for determning <script>/module taken from Q project (https://github.com/kriskowal/q)
+(function (definition) {
+    "use strict";
 
+    // This file will function properly as a <script> tag, or a module
+    // using CommonJS and NodeJS or RequireJS module formats.  In
+    // Common/Node/RequireJS, the module exports the xepOnline object and when
+    // executed as a simple <script>, it creates a xepOnline global instead.
+
+    // Montage Require
+    if (typeof bootstrap === "function") {
+        bootstrap("promise", definition);
+
+    // CommonJS
+    } else if (typeof exports === "object" && typeof module === "object") {
+        module.exports = definition();
+
+    // RequireJS
+    } else if (typeof define === "function" && define.amd) {
+        define(definition);
+
+    // SES (Secure EcmaScript)
+    } else if (typeof ses !== "undefined") {
+        if (!ses.ok()) {
+            return;
+        } else {
+            ses.makeXep = definition;
+        }
+
+    // <script>
+    } else if (typeof window !== "undefined" || typeof self !== "undefined") {
+        // Prefer window over self for add-on scripts. Use self for
+        // non-windowed contexts.
+        var global = typeof window !== "undefined" ? window : self;
+
+        // Get the `window` object, save the previous xepOnline global
+        // and initialize xepOnline as a global.
+        var previousXepOnline = global.xepOnline;
+        global.xepOnline = definition();
+
+        // Add a noConflict function so xepOnline can be removed from the
+        // global namespace.
+        global.xepOnline.noConflict = function () {
+            global.xepOnline = previousXepOnline;
+            return this;
+        };
+
+    } else {
+        throw new Error("Can't export constructor; this environment was not anticipated by CSS2PDF.");
+    }
+
+})(function() {
+    
 String.prototype.toCamel = function(){
 	return this.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace('-','');});
 };
@@ -955,3 +1007,7 @@ xepOnline.Formatter = {
 	}
 
 }
+
+    return xepOnline;
+
+});
