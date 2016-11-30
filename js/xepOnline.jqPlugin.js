@@ -1,9 +1,9 @@
 
-String.prototype.toCamel = function(){
-	return this.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace('-','');});
+var convertToCamel = function(str){
+    return str.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace('-','');});
 };
-String.prototype.fromCamel = function(){
-	return this.replace(/([A-Z])/g, function($1){return "-"+$1.toLowerCase();});
+var convertFromCamel = function(){
+    return str.replace(/([A-Z])/g, function($1){return "-"+$1.toLowerCase();});
 };
 
 var xepOnline = window.xepOnline || {};
@@ -603,14 +603,14 @@ xepOnline.Formatter = {
 		if(options && options.cssStyle) {
 		    jQuery.each(options.cssStyle, function(key, value) {
 		      jQuery.each(value, function(objkey, objvalue) {
-                stylebuilder += objkey.fromCamel()+ ': ' + objvalue + '; ';
+                stylebuilder += convertFromCamel(objkey)+ ': ' + objvalue + '; ';
               });
             });
 		}
 		if(options && options.foStyle) {
 		    jQuery.each(options.foStyle, function(key, value) {
 		      jQuery.each(value, function(objkey, objvalue) {
-                fostylebuilder += objkey.fromCamel()+ ': ' + objvalue + '; ';
+                fostylebuilder += convertFromCamel(objkey)+ ': ' + objvalue + '; ';
               });
             });
 		}
